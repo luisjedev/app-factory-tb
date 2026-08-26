@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lección 1 — De stylex.create al CSS final</title>
+  <link rel="stylesheet" href="../assets/course.css" />
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Lección 1 · 10 minutos</div>
+    <h1>De <code>stylex.create</code> al CSS final</h1>
+    <p class="lead">Objetivo: poder narrar el build completo y saber por qué los plugins pertenecen a las apps, mientras la API StyleX pertenece a <code>@repo/ui</code>.</p>
+    <nav>
+      <a href="../reference/stylex-build-pipeline.html">Abrir referencia rápida</a>
+      <a href="https://stylexjs.com/docs/learn/installation/nextjs">Fuente primaria: StyleX + Next.js</a>
+    </nav>
+  </header>
+
+  <h2>1. La distinción fundamental</h2>
+  <div class="grid">
+    <article class="card actor"><span class="badge">Autoría</span><strong>StyleX declara</strong><p>En <code>packages/ui/src/button.tsx</code>, describes estilos como objetos JavaScript.</p></article>
+    <article class="card actor"><span class="badge">Compilación JS</span><strong>Babel transforma</strong><p>El plugin reconoce llamadas StyleX y las sustituye por datos precompilados.</p></article>
+    <article class="card actor"><span class="badge">Compilación CSS</span><strong>PostCSS reúne</strong><p>El plugin recopila las reglas y sustituye el marcador <code>@stylex</code>.</p></article>
+    <article class="card actor"><span class="badge">Build</span><strong>Next empaqueta</strong><p>Turbopack ejecuta ambas pipelines y produce los artefactos de cada app.</p></article>
+    <article class="card actor"><span class="badge">Orquestación</span><strong>Turborepo coordina</strong><p>Lanza y cachea los scripts; no entiende ni transforma StyleX.</p></article>
+  </div>
+  <p>Babel se define oficialmente como un compilador de JavaScript cuyos plugins aplican transformaciones al código. PostCSS, en cambio, parsea CSS a un AST que sus plugins modifican. Son herramientas parecidas en el patrón —<em>parsear → transformar → emitir</em>—, pero trabajan sobre entradas y resultados distintos (<a href="https://babeljs.io/docs/usage">Babel</a>, <a href="https://postcss.org/docs/postcss-architecture">PostCSS</a>).</p>
+
+  <h2>2. Sigue una declaración real</h2>
+  <pre><code>// packages/ui/src/button.tsx
+const styles = stylex.create({
+  base: { backgroundColor: "red" },
+});
+
+&lt;button {...stylex.props(styles.base)} /&gt;</code></pre>
+
+  <div class="pipeline">
+    <div class="step"><b>① UI</b>Declara el estilo</div><div class="arrow">→</div>
+    <div class="step"><b>② Babel</b>Elimina la llamada runtime</div><div class="arrow">→</div>
+    <div class="step"><b>③ Turbopack</b>Empaqueta el JS compilado</div>
+  </div>
+  <div class="pipeline">
+    <div class="step"><b>④ PostCSS</b>Escanea UI y app</div><div class="arrow">→</div>
+    <div class="step"><b>⑤ @stylex</b>Se sustituye</div><div class="arrow">→</div>
+    <div class="step"><b>⑥ Navegador</b>Recibe JS + CSS</div>
+  </div>
+
+  <p>StyleX hace dos trabajos de compilación relacionados: el plugin Babel cambia el JavaScript y produce información sobre reglas; el plugin PostCSS usa la misma configuración para recopilar esas reglas y generar la hoja CSS. La documentación lo describe como una separación entre transformación de JS y generación de CSS (<a href="https://stylexjs.com/docs/learn/installation/postcss">StyleX PostCSS</a>).</p>
+
+  <div class="callout">
+    <strong>Por eso apareció el primer error.</strong>
+    <p><code>stylex.create()</code> llegó sin transformar al prerender. La función runtime está diseñada para protestar: esa llamada debía desaparecer en el build.</p>
+  </div>
+
+  <h2>3. ¿Por qué se configura en cada app?</h2>
+  <p><code>packages/ui</code> no tiene actualmente un script que produzca una librería compilada. Exporta directamente <code>src/*.tsx</code>. Quien crea un artefacto desplegable es <code>apps/web</code> o <code>apps/docs</code>, mediante <code>next build</code>.</p>
+  <p>Por tanto, la app debe conocer:</p>
+  <ul>
+    <li>cómo transformar el TSX que importa: <code>babel.config.js</code>;</li>
+    <li>dónde buscar todas las reglas: <code>postcss.config.js</code>;</li>
+    <li>dónde insertar el CSS generado: <code>@stylex;</code>;</li>
+    <li>cómo incluirlo en todas las rutas: import de <code>globals.css</code> en el layout.</li>
+  </ul>
+  <p>Turborepo no tiene una configuración StyleX porque solo encuentra scripts llamados <code>build</code>, calcula su orden y los ejecuta. La compilación interior pertenece a Next.js (<a href="https://turborepo.com/docs/crafting-your-repository/configuring-tasks">tareas de Turborepo</a>).</p>
+
+  <h2>4. Regla para ubicar dependencias</h2>
+  <div class="callout">
+    <strong>Declara una dependencia en el paquete que la importa o la ejecuta.</strong>
+    <p>pnpm mantiene el acceso estricto por paquete aunque use enlaces dentro del workspace (<a href="https://pnpm.io/workspaces">pnpm workspaces</a>).</p>
+  </div>
+  <table>
+    <thead><tr><th>Lugar</th><th>Necesita</th><th>Porque</th></tr></thead>
+    <tbody>
+      <tr><td><code>packages/ui</code></td><td><code>@stylexjs/stylex</code> en dependencies</td><td>Sus componentes lo importan al escribir código.</td></tr>
+      <tr><td><code>packages/ui</code></td><td><code>@stylexjs/eslint-plugin</code> en devDependencies</td><td>Su propio script de lint ejecuta esas reglas.</td></tr>
+      <tr><td>Cada app</td><td><code>@stylexjs/babel-plugin</code> en devDependencies</td><td>Su build transforma JS/TSX, incluido UI.</td></tr>
+      <tr><td>Cada app</td><td><code>@stylexjs/postcss-plugin</code> en devDependencies</td><td>Su build genera el CSS final.</td></tr>
+      <tr><td>Cada app</td><td><code>autoprefixer</code> en devDependencies</td><td>Solo porque su PostCSS config lo ejecuta.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Matiz:</strong> los plugins Babel/PostCSS que hoy aparecen también en <code>packages/ui</code> no son necesarios para este modelo de “exportar fuente y compilar en la app”. Sí serían necesarios allí si UI tuviera un build independiente que emitiera JS y CSS ya compilados.</p>
+
+  <h2>5. Comprueba el mapa mental</h2>
+  <section class="quiz" data-quiz data-answer="babel" data-success="La llamada stylex.create debe desaparecer antes del runtime." data-hint="Busca la herramienta que transforma el AST de JavaScript.">
+    <p>¿Quién evita el error “stylex.create call at runtime”?</p>
+    <div class="answers">
+      <button data-choice="babel">Babel transforma el JS</button>
+      <button data-choice="postcss">PostCSS genera el CSS</button>
+      <button data-choice="turbo">Turborepo coordina los builds</button>
+      <button data-choice="stylex">StyleX declara los estilos</button>
+    </div><div class="feedback" aria-live="polite"></div>
+  </section>
+  <section class="quiz" data-quiz data-answer="postcss" data-success="El plugin recopila reglas y sustituye la directiva @stylex." data-hint="Busca la herramienta responsable de la hoja de estilos final.">
+    <p>¿Quién sustituye <code>@stylex;</code> por reglas atómicas?</p>
+    <div class="answers">
+      <button data-choice="babel">Babel transforma el JS</button>
+      <button data-choice="postcss">PostCSS genera el CSS</button>
+      <button data-choice="turbo">Turborepo coordina los builds</button>
+      <button data-choice="stylex">StyleX declara los estilos</button>
+    </div><div class="feedback" aria-live="polite"></div>
+  </section>
+  <section class="quiz" data-quiz data-answer="turbo" data-success="Turborepo organiza tareas, pero delega el build real a Next." data-hint="Busca el actor que trabaja con scripts y el grafo del monorepo.">
+    <p>¿Quién ejecuta y cachea los builds de web y docs?</p>
+    <div class="answers">
+      <button data-choice="babel">Babel transforma el JS</button>
+      <button data-choice="postcss">PostCSS genera el CSS</button>
+      <button data-choice="turbo">Turborepo coordina los builds</button>
+      <button data-choice="stylex">StyleX declara los estilos</button>
+    </div><div class="feedback" aria-live="polite"></div>
+  </section>
+
+  <h2>Tu prueba de dominio</h2>
+  <p>Sin mirar arriba, intenta explicar en voz alta este recorrido usando exactamente estos seis hitos: <strong>UI → Babel → Turbopack → PostCSS → @stylex → navegador</strong>. Después consulta la <a href="../reference/stylex-build-pipeline.html">referencia completa</a> y detecta qué enlace te faltó.</p>
+
+  <footer>
+    <p><strong>Siguiente paso sugerido:</strong> desmontar juntos cada opción de <code>babel.config.js</code> y <code>postcss.config.js</code>, incluyendo qué pasaría al quitarla.</p>
+    <p>Hazme preguntas sobre cualquier punto que no puedas explicar todavía; esa fricción indica exactamente cuál debe ser la próxima mini-lección.</p>
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lección 2 — Cómo Next descubre configuraciones</title>
+  <link rel="stylesheet" href="../assets/course.css" />
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Lección 2 · 7 minutos</div>
+    <h1>¿Cómo puede Next “descubrir” Babel y PostCSS?</h1>
+    <p class="lead">Porque los archivos de configuración son puntos de extensión definidos por contrato: Next conoce sus nombres, los busca y conecta su contenido a la pipeline.</p>
+    <nav>
+      <a href="0001-de-stylex-create-al-css-final.html">← Lección 1</a>
+      <a href="../reference/stylex-build-pipeline.html">Referencia de la pipeline</a>
+    </nav>
+  </header>
+
+  <h2>No es magia: es una búsqueda de archivos</h2>
+  <p>Cuando se ejecuta el script de <code>apps/web</code>:</p>
+  <pre><code>"build": "next build"</code></pre>
+  <p>el CLI de Next toma <code>apps/web</code> como raíz de la aplicación. Durante la preparación del build busca nombres que forman parte de su contrato:</p>
+  <div class="grid">
+    <article class="card"><h3>Configuración de Next</h3><p><code>next.config.js</code></p></article>
+    <article class="card"><h3>Configuración de Babel</h3><p><code>babel.config.js</code>, <code>.babelrc</code> y variantes admitidas</p></article>
+    <article class="card"><h3>Configuración de PostCSS</h3><p><code>postcss.config.js</code> y variantes admitidas</p></article>
+    <article class="card"><h3>Configuración TypeScript</h3><p><code>tsconfig.json</code></p></article>
+  </div>
+  <p>El propio código de Next contiene una lista de nombres Babel y devuelve el primero que existe. Es, conceptualmente, algo parecido a esto:</p>
+  <pre><code>const knownBabelFiles = [
+  ".babelrc",
+  "babel.config.js",
+  "babel.config.json",
+  // variantes admitidas por el detector
+];
+
+const config = knownBabelFiles.find(existsInAppRoot);
+if (config) enableBabelForTheBuild(config);</code></pre>
+  <p>Puedes comprobarlo en el <a href="https://github.com/vercel/next.js/blob/v16.3.0/packages/next/src/build/get-babel-config-file.ts">detector de configuración Babel de Next</a>. Next.js 16 documenta además que Turbopack activa Babel automáticamente al detectar una configuración (<a href="https://nextjs.org/docs/app/api-reference/turbopack">referencia de Turbopack</a>).</p>
+
+  <h2>¿Qué significa “conectar” la configuración?</h2>
+  <div class="pipeline">
+    <div class="step"><b>① Descubrir</b>Encontrar archivo conocido</div><div class="arrow">→</div>
+    <div class="step"><b>② Cargar</b>Evaluar su export ESM</div><div class="arrow">→</div>
+    <div class="step"><b>③ Resolver</b>Localizar plugins instalados</div><div class="arrow">→</div>
+    <div class="step"><b>④ Ejecutar</b>Aplicarlos al módulo adecuado</div>
+  </div>
+
+  <p>En Babel, Next lee el objeto exportado y entrega cada archivo JS/TSX de su grafo al loader Babel con esos presets y plugins. En tu configuración, <code>next/babel</code> conserva las transformaciones esperadas por Next y <code>@stylexjs/babel-plugin</code> añade la transformación StyleX.</p>
+  <p>En PostCSS, cuando un CSS importado entra en el grafo —por ejemplo <code>app/globals.css</code>— Next carga la configuración PostCSS y ejecuta los plugins enumerados. La documentación de Turbopack dice explícitamente que procesa automáticamente estos archivos en workers de Node.js.</p>
+
+  <div class="callout">
+    <strong>“Automático” no significa “universal”.</strong>
+    <p>Si ejecutaras esos archivos con <code>node</code> directamente, Node ignoraría <code>babel.config.js</code> y <code>postcss.config.js</code>. Funcionan porque el programa que estás ejecutando es Next y Next implementa esos puntos de extensión.</p>
+  </div>
+
+  <h2>Por qué no hace falta mencionarlos en next.config.js</h2>
+  <p><code>next.config.js</code>, Babel y PostCSS son tres canales de configuración independientes:</p>
+  <table>
+    <thead><tr><th>Canal</th><th>Consumidor</th><th>Pregunta que responde</th></tr></thead>
+    <tbody>
+      <tr><td><code>next.config.js</code></td><td>Next.js</td><td>¿Cómo se comporta el framework?</td></tr>
+      <tr><td><code>babel.config.js</code></td><td>Integración Babel de Next</td><td>¿Qué transformaciones aplicar al JavaScript?</td></tr>
+      <tr><td><code>postcss.config.js</code></td><td>Integración PostCSS de Next</td><td>¿Qué transformaciones aplicar al CSS?</td></tr>
+    </tbody>
+  </table>
+  <p>Next no necesita que <code>next.config.js</code> importe las otras dos porque ya tiene detectores separados. StyleX confirma este comportamiento: desde Next 16.0.3, basta definir Babel y PostCSS en la raíz de la app para Webpack y Turbopack (<a href="https://stylexjs.com/docs/learn/installation/nextjs">guía oficial</a>).</p>
+
+  <h2>Por qué están en apps/web y apps/docs</h2>
+  <p>Turborepo encuentra el script <code>build</code> de cada workspace y lo ejecuta en el contexto de ese paquete. Así, cada invocación tiene su propia raíz:</p>
+  <pre><code>apps/web   → next build → descubre apps/web/babel.config.js
+apps/docs  → next build → descubre apps/docs/babel.config.js</code></pre>
+  <p>Esto permite que dos apps del mismo monorepo tengan pipelines diferentes. La raíz relevante no es necesariamente la raíz Git: es la raíz de la aplicación Next que se está construyendo.</p>
+
+  <h2>Qué cosas siguen siendo obligatorias</h2>
+  <ul>
+    <li>El archivo debe tener un <strong>nombre admitido</strong>.</li>
+    <li>Debe estar en el <strong>lugar donde Next lo busca</strong>.</li>
+    <li>Debe exportar un objeto con el <strong>formato esperado</strong>.</li>
+    <li>Los plugins deben estar <strong>instalados y resolverse</strong> desde la app.</li>
+    <li>Para PostCSS debe existir CSS dentro del grafo; en nuestro caso, el layout importa <code>globals.css</code>.</li>
+    <li>El formato ESM/CommonJS debe coincidir con <code>"type": "module"</code> y con las limitaciones del loader.</li>
+  </ul>
+
+  <section class="quiz" data-quiz data-answer="next" data-success="Next implementa detectores explícitos para nombres de configuración conocidos." data-hint="No es Node, Babel ni Turborepo quien inicia la búsqueda en este build.">
+    <p>¿Por qué funciona al crear <code>babel.config.js</code>?</p>
+    <div class="answers">
+      <button data-choice="next">Next busca nombres conocidos</button>
+      <button data-choice="babel">Babel busca rutas dinámicas</button>
+      <button data-choice="node">Node ejecuta cada archivo</button>
+      <button data-choice="turbo">Turbo importa toda configuración</button>
+    </div><div class="feedback" aria-live="polite"></div>
+  </section>
+
+  <section class="quiz" data-quiz data-answer="root" data-success="Cada comando next build descubre la configuración desde su app." data-hint="Piensa desde qué paquete se ejecuta el script build.">
+    <p>¿Por qué repetimos la configuración en web y docs?</p>
+    <div class="answers">
+      <button data-choice="root">Cada build empieza allí</button>
+      <button data-choice="ui">UI exige esa carpeta</button>
+      <button data-choice="css">CSS cambia el directorio</button>
+      <button data-choice="pnpm">pnpm copia toda configuración</button>
+    </div><div class="feedback" aria-live="polite"></div>
+  </section>
+
+  <footer>
+    <p><strong>Modelo mental:</strong> un archivo de configuración no se activa por existir; se activa porque una herramienta ha programado su descubrimiento.</p>
+    <p>Pregúntame cualquier detalle que no esté claro. El siguiente paso natural es distinguir exactamente qué hacen SWC, Babel y Turbopack cuando participan a la vez.</p>
+  </footer>
+</main>
+</body>
+</html>
