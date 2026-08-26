@@ -1,17 +1,22 @@
+import * as stylex from "@stylexjs/stylex";
+
 export function Card({
-  className,
   title,
   children,
   href,
 }: {
-  className?: string;
   title: string;
   children: React.ReactNode;
   href: string;
 }) {
+  const styles = stylex.create({
+    base: {
+      color: "yellow",
+    },
+  });
   return (
     <a
-      className={className}
+      {...stylex.props(styles.base)}
       href={`${href}?utm_source=create-turbo&utm_medium=basic&utm_campaign=create-turbo"`}
       rel="noopener noreferrer"
       target="_blank"
