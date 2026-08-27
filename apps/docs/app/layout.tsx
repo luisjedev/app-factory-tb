@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import * as stylex from "@stylexjs/stylex";
+import { themeStyles } from "@repo/ui/theme-styles";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -22,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html {...stylex.props(themeStyles.root)} lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
       </body>

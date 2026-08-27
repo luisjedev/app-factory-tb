@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./theme-styles": "./src/theme-styles.ts",
+    "./themes": "./src/themes.ts",
+    "./tokens": "./src/tokens.stylex.ts",
     "./*": "./src/*.tsx"
   },
   "scripts": {

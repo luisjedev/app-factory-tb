@@ -2,6 +2,7 @@
 
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import * as stylex from "@stylexjs/stylex";
+import { colors, effects, radii } from "./tokens.stylex";
 
 export type ButtonVariant =
   | "default"
@@ -28,16 +29,18 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const styles = stylex.create({
   base: {
-    alignItems: "center",
-    appearance: "none",
     borderColor: "transparent",
-    borderRadius: "0.375rem",
+    borderRadius: radii.md,
     borderStyle: "solid",
     borderWidth: "1px",
+    gap: "0.5rem",
+    outline: "none",
+    textDecoration: "none",
+    alignItems: "center",
+    appearance: "none",
     boxShadow: {
       default: "none",
-      ":focus-visible":
-        "0 0 0 3px color-mix(in srgb, var(--ring, #71717a) 50%, transparent)",
+      ":focus-visible": `0 0 0 3px ${effects.focusRing}`,
     },
     boxSizing: "border-box",
     cursor: {
@@ -49,19 +52,16 @@ const styles = stylex.create({
     fontFamily: "inherit",
     fontSize: "0.875rem",
     fontWeight: 500,
-    gap: "0.5rem",
     justifyContent: "center",
     lineHeight: "1.25rem",
     opacity: {
       default: 1,
       ":disabled": 0.5,
     },
-    outline: "none",
     pointerEvents: {
       default: "auto",
       ":disabled": "none",
     },
-    textDecoration: "none",
     transitionDuration: "150ms",
     transitionProperty:
       "color, background-color, border-color, box-shadow, opacity",
@@ -70,56 +70,53 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   invalid: {
-    borderColor: "var(--destructive, #dc2626)",
+    borderColor: colors.destructive,
   },
   variantDefault: {
     backgroundColor: {
-      default: "var(--primary, #18181b)",
-      ":hover":
-        "color-mix(in srgb, var(--primary, #18181b) 90%, transparent)",
+      default: colors.primary,
+      ":hover": effects.primaryHover,
     },
-    color: "var(--primary-foreground, #fafafa)",
+    color: colors.primaryForeground,
   },
   destructive: {
     backgroundColor: {
-      default: "var(--destructive, #dc2626)",
-      ":hover":
-        "color-mix(in srgb, var(--destructive, #dc2626) 90%, transparent)",
+      default: colors.destructive,
+      ":hover": effects.destructiveHover,
     },
-    color: "var(--destructive-foreground, #ffffff)",
+    color: colors.destructiveForeground,
   },
   outline: {
+    borderColor: colors.border,
     backgroundColor: {
-      default: "var(--background, transparent)",
-      ":hover": "var(--accent, #f4f4f5)",
+      default: colors.background,
+      ":hover": colors.accent,
     },
-    borderColor: "var(--border, #e4e4e7)",
     color: {
-      default: "var(--foreground, #18181b)",
-      ":hover": "var(--accent-foreground, #18181b)",
+      default: colors.foreground,
+      ":hover": colors.accentForeground,
     },
   },
   secondary: {
     backgroundColor: {
-      default: "var(--secondary, #f4f4f5)",
-      ":hover":
-        "color-mix(in srgb, var(--secondary, #f4f4f5) 80%, transparent)",
+      default: colors.secondary,
+      ":hover": effects.secondaryHover,
     },
-    color: "var(--secondary-foreground, #18181b)",
+    color: colors.secondaryForeground,
   },
   ghost: {
     backgroundColor: {
       default: "transparent",
-      ":hover": "var(--accent, #f4f4f5)",
+      ":hover": colors.accent,
     },
     color: {
-      default: "var(--foreground, #18181b)",
-      ":hover": "var(--accent-foreground, #18181b)",
+      default: colors.foreground,
+      ":hover": colors.accentForeground,
     },
   },
   link: {
     backgroundColor: "transparent",
-    color: "var(--primary, #18181b)",
+    color: colors.primary,
     textDecorationLine: {
       default: "none",
       ":hover": "underline",
@@ -127,32 +124,32 @@ const styles = stylex.create({
     textUnderlineOffset: "4px",
   },
   sizeDefault: {
-    height: "2.25rem",
     paddingBlock: "0.5rem",
     paddingInline: "1rem",
+    height: "2.25rem",
   },
   sm: {
     gap: "0.375rem",
-    height: "2rem",
     paddingInline: "0.75rem",
+    height: "2rem",
   },
   lg: {
-    height: "2.5rem",
     paddingInline: "1.5rem",
+    height: "2.5rem",
   },
   icon: {
-    height: "2.25rem",
     padding: 0,
+    height: "2.25rem",
     width: "2.25rem",
   },
   iconSm: {
-    height: "2rem",
     padding: 0,
+    height: "2rem",
     width: "2rem",
   },
   iconLg: {
-    height: "2.5rem",
     padding: 0,
+    height: "2.5rem",
     width: "2.5rem",
   },
 });
