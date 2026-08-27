@@ -16,18 +16,18 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@stylexjs/babel-plugin": "^0.19.0",
-    "@stylexjs/eslint-plugin": "^0.19.0",
-    "@stylexjs/postcss-plugin": "^0.19.0",
-    "@types/node": "^22.15.3",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
-    "eslint": "^9.39.1",
-    "typescript": "5.9.2"
+    "@stylexjs/babel-plugin": "catalog:",
+    "@stylexjs/eslint-plugin": "catalog:",
+    "@stylexjs/postcss-plugin": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
   },
   "dependencies": {
-    "@stylexjs/stylex": "^0.19.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "@stylexjs/stylex": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

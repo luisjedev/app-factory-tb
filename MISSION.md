@@ -1,13 +1,15 @@
-# Mission: Dominar la pipeline de StyleX en el monorepo
+# Mission: Evaluar y dominar StyleX en el monorepo
 
 ## Why
-Poder mantener, ampliar y diagnosticar de forma autónoma la integración de StyleX entre `packages/ui` y las aplicaciones Next.js, sin depender de copiar configuraciones sin entenderlas.
+Decidir con evidencia si StyleX puede sostener el sistema visual compartido entre `packages/ui` y aplicaciones React construidas con Next.js o Vite, y poder mantener esa integración sin copiar configuraciones sin entenderlas.
 
 ## Success looks like
 - Explicar el recorrido completo desde `stylex.create()` hasta el CSS que recibe el navegador.
+- Elegir el adaptador de StyleX apropiado para Next.js, Vite y otros builds.
 - Decidir correctamente en qué `package.json` debe declararse cada dependencia.
 - Identificar por la forma de un error qué etapa de la pipeline está fallando.
-- Replicar la integración en una nueva app del monorepo con criterio propio.
+- Añadir una app consumidora y validar su compatibilidad con UI, tokens y temas.
+- Estimar el coste de mantenimiento antes de adoptar una nueva tecnología.
 
 ## Constraints
 - Aprender en español y sobre la configuración real de este repositorio.
@@ -18,3 +20,4 @@ Poder mantener, ampliar y diagnosticar de forma autónoma la integración de Sty
 - Escribir plugins personalizados de Babel o PostCSS.
 - Estudiar la implementación interna completa de Turbopack.
 - Diseñar por ahora una librería `@repo/ui` publicable fuera del monorepo.
+- Garantizar compatibilidad con frameworks no React sin una prueba específica.
