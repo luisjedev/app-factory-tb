@@ -1,5 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 
+const styles = stylex.create({
+  base: {
+    color: "yellow",
+  },
+});
+
 export function Card({
   title,
   children,
@@ -9,11 +15,6 @@ export function Card({
   children: React.ReactNode;
   href: string;
 }) {
-  const styles = stylex.create({
-    base: {
-      color: "yellow",
-    },
-  });
   return (
     <a
       {...stylex.props(styles.base)}

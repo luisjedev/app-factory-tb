@@ -23,7 +23,6 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <div>{add(1, 2)}</div>
-      <Button appName="App demo">Prueba</Button>
       <main className={styles.main}>
         <ThemeImage
           className={styles.logo}
@@ -66,7 +65,9 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        <Button appName="web">Open alert</Button>
+        <Button appName="web" size="lg" variant="destructive">
+          Open alert
+        </Button>
       </main>
       <footer className={styles.footer}>
         <a
