@@ -14,7 +14,10 @@ export default {
         },
         plugins: babelConfig.plugins,
       },
-      useCSSLayers: true,
+      useCSSLayers: {
+        before: ["reset"],
+        prefix: "stylex",
+      },
     },
     autoprefixer: {},
   },
