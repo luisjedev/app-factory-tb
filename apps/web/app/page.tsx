@@ -28,7 +28,6 @@ export default function Home() {
           alt="Turborepo logo"
           width={180}
           height={38}
-          priority
         />
         <ol>
           <li>
