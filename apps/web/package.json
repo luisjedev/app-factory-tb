@@ -11,7 +11,6 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "@repo/math": "workspace:*",
     "@repo/ui": "workspace:*",
     "@stylexjs/stylex": "catalog:",
     "next": "catalog:",

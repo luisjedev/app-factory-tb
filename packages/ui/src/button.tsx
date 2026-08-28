@@ -154,57 +154,60 @@ const styles = stylex.create({
   },
 });
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
-    appName,
-    children,
-    className,
-    onClick,
-    size = "default",
-    type = "button",
-    variant = "default",
-    "aria-invalid": ariaInvalid,
-    ...props
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button(
+    {
+      appName,
+      children,
+      className,
+      onClick,
+      size = "default",
+      type = "button",
+      variant = "default",
+      "aria-invalid": ariaInvalid,
+      ...props
+    },
+    ref,
+  ) {
+    const styleProps = stylex.props(
+      styles.base,
+      variant === "default" && styles.variantDefault,
+      variant === "destructive" && styles.destructive,
+      variant === "outline" && styles.outline,
+      variant === "secondary" && styles.secondary,
+      variant === "ghost" && styles.ghost,
+      variant === "link" && styles.link,
+      size === "default" && styles.sizeDefault,
+      size === "sm" && styles.sm,
+      size === "lg" && styles.lg,
+      size === "icon" && styles.icon,
+      size === "icon-sm" && styles.iconSm,
+      size === "icon-lg" && styles.iconLg,
+      (ariaInvalid === true || ariaInvalid === "true") && styles.invalid,
+    );
+    const number: string = "error";
+
+    return (
+      <button
+        {...props}
+        {...styleProps}
+        aria-invalid={ariaInvalid}
+        className={[styleProps.className, className].filter(Boolean).join(" ")}
+        data-slot="button"
+        data-size={size}
+        data-variant={variant}
+        ref={ref}
+        type={type}
+        onClick={(event) => {
+          onClick?.(event);
+
+          if (appName && !event.defaultPrevented) {
+            alert(`Hello from your ${appName} app!`);
+          }
+        }}
+      >
+        {children}
+      </button>
+    );
   },
-  ref,
-) {
-  const styleProps = stylex.props(
-    styles.base,
-    variant === "default" && styles.variantDefault,
-    variant === "destructive" && styles.destructive,
-    variant === "outline" && styles.outline,
-    variant === "secondary" && styles.secondary,
-    variant === "ghost" && styles.ghost,
-    variant === "link" && styles.link,
-    size === "default" && styles.sizeDefault,
-    size === "sm" && styles.sm,
-    size === "lg" && styles.lg,
-    size === "icon" && styles.icon,
-    size === "icon-sm" && styles.iconSm,
-    size === "icon-lg" && styles.iconLg,
-    (ariaInvalid === true || ariaInvalid === "true") && styles.invalid,
-  );
-
-  return (
-    <button
-      {...props}
-      {...styleProps}
-      aria-invalid={ariaInvalid}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
-      data-slot="button"
-      data-size={size}
-      data-variant={variant}
-      ref={ref}
-      type={type}
-      onClick={(event) => {
-        onClick?.(event);
-
-        if (appName && !event.defaultPrevented) {
-          alert(`Hello from your ${appName} app!`);
-        }
-      }}
-    >
-      {children}
-    </button>
-  );
-});
+);
