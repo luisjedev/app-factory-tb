@@ -1,24 +1,10 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createNextStylexBabelConfig } from "@repo/stylex-config/babel";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
-export default {
-  presets: ["next/babel"],
-  plugins: [
-    [
-      "@stylexjs/babel-plugin",
-      {
-        dev: process.env.NODE_ENV !== "production",
-        runtimeInjection: false,
-        treeshakeCompensation: true,
-        aliases: {
-          "@/*": [path.join(__dirname, "*")],
-        },
-        unstable_moduleResolution: {
-          type: "commonJS",
-        },
-      },
-    ],
-  ],
-};
+export default createNextStylexBabelConfig({
+  dev: process.env.NODE_ENV !== "production",
+  rootDir,
+});

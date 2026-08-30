@@ -18,7 +18,6 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@stylexjs/babel-plugin": "catalog:",
-    "@stylexjs/eslint-plugin": "catalog:",
     "@stylexjs/postcss-plugin": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",

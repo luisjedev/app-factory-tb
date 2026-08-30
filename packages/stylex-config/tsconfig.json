@@ -1,0 +1,8 @@
+{
+  "extends": "@repo/typescript-config/node.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": ["*.d.ts", "babel.js", "postcss.js", "shared.js", "vite.js"]
+}

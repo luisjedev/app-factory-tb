@@ -1,16 +1,7 @@
-import { defineConfig } from "vite";
+import { createStylexVitePlugin } from "@repo/stylex-config/vite";
 import react from "@vitejs/plugin-react";
-import { unplugin as stylex } from "@stylexjs/unplugin";
+import { defineConfig } from "vite";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    stylex.vite({
-      useCSSLayers: {
-        before: ["reset"],
-        prefix: "stylex",
-      },
-    }),
-    react(),
-  ],
+  plugins: [createStylexVitePlugin(), react()],
 });

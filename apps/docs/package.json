@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
+    "@repo/stylex-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@stylexjs/babel-plugin": "catalog:",
     "@stylexjs/postcss-plugin": "catalog:",

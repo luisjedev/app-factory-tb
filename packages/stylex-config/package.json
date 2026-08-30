@@ -1,0 +1,40 @@
+{
+  "name": "@repo/stylex-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./babel": {
+      "types": "./babel.d.ts",
+      "default": "./babel.js"
+    },
+    "./postcss": {
+      "types": "./postcss.d.ts",
+      "default": "./postcss.js"
+    },
+    "./vite": {
+      "types": "./vite.d.ts",
+      "default": "./vite.js"
+    }
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@stylexjs/unplugin": "0.19.0"
+  },
+  "peerDependenciesMeta": {
+    "@stylexjs/unplugin": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@stylexjs/unplugin": "catalog:",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}
