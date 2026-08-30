@@ -45,10 +45,17 @@ export const effects = stylex.defineVars({
     `color-mix(in srgb, ${colors.destructive} 90%, transparent)`,
   focusRing: () =>
     `color-mix(in srgb, ${colors.ring} 50%, transparent)`,
+  focusRingShadow: () =>
+    `0 0 0 3px color-mix(in srgb, ${colors.ring} 50%, transparent)`,
+  invalidFocusRing: () =>
+    `0 0 0 3px color-mix(in srgb, ${colors.destructive} 35%, transparent)`,
+  invalidRing: () =>
+    `0 0 0 1px color-mix(in srgb, ${colors.destructive} 35%, transparent)`,
   primaryHover: () =>
     `color-mix(in srgb, ${colors.primary} 90%, transparent)`,
   secondaryHover: () =>
     `color-mix(in srgb, ${colors.secondary} 80%, transparent)`,
+  shadowSm: "0 1px 2px rgb(0 0 0 / 0.05)",
 });
 
 export const radiusBase = stylex.defineVars({
