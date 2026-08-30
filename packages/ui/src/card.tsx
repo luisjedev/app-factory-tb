@@ -15,7 +15,6 @@ export function Card({
   children: React.ReactNode;
   href: string;
 }) {
-  const number: number = 3;
   return (
     <a
       {...stylex.props(styles.base)}

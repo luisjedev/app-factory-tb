@@ -185,7 +185,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size === "icon-lg" && styles.iconLg,
       (ariaInvalid === true || ariaInvalid === "true") && styles.invalid,
     );
-    const number: string = "error";
 
     return (
       <button
