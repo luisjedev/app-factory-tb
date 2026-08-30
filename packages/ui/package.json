@@ -3,11 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
+    "./alert": "./src/alert.tsx",
+    "./badge": "./src/badge.tsx",
+    "./button": "./src/button.tsx",
+    "./card": "./src/card.tsx",
+    "./code": "./src/code.tsx",
+    "./input": "./src/input.tsx",
+    "./label": "./src/label.tsx",
+    "./native-select": "./src/native-select.tsx",
     "./reset.css": "./src/reset.css",
     "./theme-styles": "./src/theme-styles.ts",
     "./themes": "./src/themes.ts",
-    "./tokens": "./src/tokens.stylex.ts",
-    "./*": "./src/*.tsx"
+    "./tokens": "./src/tokens.stylex.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
