@@ -4,14 +4,16 @@ import {
   type OptionHTMLAttributes,
   type SelectHTMLAttributes,
 } from "react";
+import type { StyleableProps } from "./style-props";
 import { colors, effects, radii } from "./tokens.stylex";
 
 export type NativeSelectSize = "sm" | "default";
 
-export interface NativeSelectProps
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> {
+export type NativeSelectProps = StyleableProps<
+  Omit<SelectHTMLAttributes<HTMLSelectElement>, "size">
+> & {
   size?: NativeSelectSize;
-}
+};
 
 const styles = stylex.create({
   base: {
@@ -79,8 +81,8 @@ const styles = stylex.create({
 export const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
   function NativeSelect(
     {
-      className,
       size = "default",
+      style,
       "aria-invalid": ariaInvalid,
       ...props
     },
@@ -92,6 +94,7 @@ export const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
       size === "default" && styles.sizeDefault,
       size === "sm" && styles.sm,
       (ariaInvalid === true || ariaInvalid === "true") && styles.invalid,
+      style,
     );
 
     return (
@@ -99,7 +102,6 @@ export const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
         {...props}
         {...styleProps}
         aria-invalid={ariaInvalid}
-        className={[styleProps.className, className].filter(Boolean).join(" ")}
         data-size={size}
         data-slot="native-select"
         ref={ref}
@@ -108,20 +110,20 @@ export const NativeSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
   },
 );
 
-export type NativeSelectOptionProps =
-  OptionHTMLAttributes<HTMLOptionElement>;
+export type NativeSelectOptionProps = StyleableProps<
+  OptionHTMLAttributes<HTMLOptionElement>
+>;
 
 export const NativeSelectOption = forwardRef<
   HTMLOptionElement,
   NativeSelectOptionProps
->(function NativeSelectOption({ className, ...props }, ref) {
-  const styleProps = stylex.props(styles.option);
+>(function NativeSelectOption({ style, ...props }, ref) {
+  const styleProps = stylex.props(styles.option, style);
 
   return (
     <option
       {...props}
       {...styleProps}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="native-select-option"
       ref={ref}
     />

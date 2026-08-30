@@ -1,8 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 import { forwardRef, type InputHTMLAttributes } from "react";
+import type { StyleableProps } from "./style-props";
 import { colors, effects, radii } from "./tokens.stylex";
 
-export type InputProps = InputHTMLAttributes<HTMLInputElement>;
+export type InputProps = StyleableProps<
+  InputHTMLAttributes<HTMLInputElement>
+>;
 
 const styles = stylex.create({
   base: {
@@ -58,13 +61,14 @@ const styles = stylex.create({
 });
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { className, type, "aria-invalid": ariaInvalid, ...props },
+  { style, type, "aria-invalid": ariaInvalid, ...props },
   ref,
 ) {
   const styleProps = stylex.props(
     styles.base,
     styles.focus,
     (ariaInvalid === true || ariaInvalid === "true") && styles.invalid,
+    style,
   );
 
   return (
@@ -72,7 +76,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {...props}
       {...styleProps}
       aria-invalid={ariaInvalid}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="input"
       ref={ref}
       type={type}

@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { forwardRef, type HTMLAttributes } from "react";
+import type { StyleableProps } from "./style-props";
 import { colors, effects, radii } from "./tokens.stylex";
 
 export type BadgeVariant =
@@ -8,9 +9,9 @@ export type BadgeVariant =
   | "destructive"
   | "outline";
 
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+export type BadgeProps = StyleableProps<HTMLAttributes<HTMLSpanElement>> & {
   variant?: BadgeVariant;
-}
+};
 
 const styles = stylex.create({
   base: {
@@ -68,7 +69,7 @@ const styles = stylex.create({
 
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   {
-    className,
+    style,
     variant = "default",
     "aria-invalid": ariaInvalid,
     ...props
@@ -82,6 +83,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     variant === "destructive" && styles.destructive,
     variant === "outline" && styles.outline,
     (ariaInvalid === true || ariaInvalid === "true") && styles.invalid,
+    style,
   );
 
   return (
@@ -89,7 +91,6 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
       {...props}
       {...styleProps}
       aria-invalid={ariaInvalid}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="badge"
       data-variant={variant}
       ref={ref}

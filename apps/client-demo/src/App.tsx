@@ -20,6 +20,7 @@ import {
   NativeSelectOption,
 } from "@repo/ui/native-select";
 import { themeStyles } from "@repo/ui/theme-styles";
+import { radii } from "@repo/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 const styles = stylex.create({
@@ -57,6 +58,10 @@ const styles = stylex.create({
     lineHeight: 1.5,
     margin: 0,
     maxWidth: "38rem",
+  },
+  card: {
+    borderRadius: radii.xxxl,
+    width: "100%",
   },
   metadata: {
     display: "flex",
@@ -101,7 +106,7 @@ function App() {
           </AlertDescription>
         </Alert>
 
-        <Card aria-labelledby="issue-title" className="client-demo-card">
+        <Card aria-labelledby="issue-title" style={styles.card}>
           <CardHeader>
             <div {...stylex.props(styles.metadata)}>
               <Badge>ISS-0001</Badge>
@@ -133,7 +138,7 @@ function App() {
             </form>
           </CardContent>
 
-          <CardFooter {...stylex.props(styles.footer)}>
+          <CardFooter style={styles.footer}>
             <Button>Open issue</Button>
           </CardFooter>
         </Card>

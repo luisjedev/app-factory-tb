@@ -2,6 +2,7 @@
 
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import * as stylex from "@stylexjs/stylex";
+import type { StyleableProps } from "./style-props";
 import { colors, effects, radii } from "./tokens.stylex";
 
 export type ButtonVariant =
@@ -20,12 +21,14 @@ export type ButtonSize =
   | "icon-sm"
   | "icon-lg";
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export type ButtonProps = StyleableProps<
+  ButtonHTMLAttributes<HTMLButtonElement>
+> & {
   /** Conservado por compatibilidad con los ejemplos del monorepo. */
   appName?: string;
   size?: ButtonSize;
   variant?: ButtonVariant;
-}
+};
 
 const styles = stylex.create({
   base: {
@@ -159,8 +162,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       appName,
       children,
-      className,
       onClick,
+      style,
       size = "default",
       type = "button",
       variant = "default",
@@ -184,6 +187,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size === "icon-sm" && styles.iconSm,
       size === "icon-lg" && styles.iconLg,
       (ariaInvalid === true || ariaInvalid === "true") && styles.invalid,
+      style,
     );
 
     return (
@@ -191,7 +195,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         {...styleProps}
         aria-invalid={ariaInvalid}
-        className={[styleProps.className, className].filter(Boolean).join(" ")}
         data-slot="button"
         data-size={size}
         data-variant={variant}

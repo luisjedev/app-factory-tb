@@ -1,12 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import { forwardRef, type HTMLAttributes } from "react";
+import type { StyleableProps } from "./style-props";
 import { colors, radii } from "./tokens.stylex";
 
 export type AlertVariant = "default" | "destructive";
 
-export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
+export type AlertProps = StyleableProps<HTMLAttributes<HTMLDivElement>> & {
   variant?: AlertVariant;
-}
+};
 
 const styles = stylex.create({
   base: {
@@ -44,20 +45,20 @@ const styles = stylex.create({
 });
 
 export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  { className, role = "alert", variant = "default", ...props },
+  { role = "alert", style, variant = "default", ...props },
   ref,
 ) {
   const styleProps = stylex.props(
     styles.base,
     variant === "default" && styles.variantDefault,
     variant === "destructive" && styles.destructive,
+    style,
   );
 
   return (
     <div
       {...props}
       {...styleProps}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="alert"
       data-variant={variant}
       ref={ref}
@@ -66,17 +67,16 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   );
 });
 
-export type AlertTitleProps = HTMLAttributes<HTMLDivElement>;
+export type AlertTitleProps = StyleableProps<HTMLAttributes<HTMLDivElement>>;
 
 export const AlertTitle = forwardRef<HTMLDivElement, AlertTitleProps>(
-  function AlertTitle({ className, ...props }, ref) {
-    const styleProps = stylex.props(styles.title);
+  function AlertTitle({ style, ...props }, ref) {
+    const styleProps = stylex.props(styles.title, style);
 
     return (
       <div
         {...props}
         {...styleProps}
-        className={[styleProps.className, className].filter(Boolean).join(" ")}
         data-slot="alert-title"
         ref={ref}
       />
@@ -84,19 +84,20 @@ export const AlertTitle = forwardRef<HTMLDivElement, AlertTitleProps>(
   },
 );
 
-export type AlertDescriptionProps = HTMLAttributes<HTMLDivElement>;
+export type AlertDescriptionProps = StyleableProps<
+  HTMLAttributes<HTMLDivElement>
+>;
 
 export const AlertDescription = forwardRef<
   HTMLDivElement,
   AlertDescriptionProps
->(function AlertDescription({ className, ...props }, ref) {
-  const styleProps = stylex.props(styles.description);
+>(function AlertDescription({ style, ...props }, ref) {
+  const styleProps = stylex.props(styles.description, style);
 
   return (
     <div
       {...props}
       {...styleProps}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="alert-description"
       ref={ref}
     />

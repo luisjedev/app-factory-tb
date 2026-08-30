@@ -14,7 +14,7 @@
     "./reset.css": "./src/reset.css",
     "./theme-styles": "./src/theme-styles.ts",
     "./themes": "./src/themes.ts",
-    "./tokens": "./src/tokens.stylex.ts"
+    "./tokens.stylex": "./src/tokens.stylex.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

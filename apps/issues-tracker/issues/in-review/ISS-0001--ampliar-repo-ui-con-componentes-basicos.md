@@ -37,7 +37,7 @@ El paquete compartido `@repo/ui` solo ofrece un botón completo y un `card.tsx` 
 - No se incorporan Tailwind, CVA ni utilidades de composición de clases para reproducir el estilo original.
 - Los colores, radios y efectos reutilizan los tokens compartidos existentes o extensiones justificadas de esos tokens.
 - `card.tsx` deja de contener el enlace de demostración actual y expone una tarjeta componible.
-- Los componentes admiten `className` y props nativas sin perder las clases generadas por StyleX.
+- Los componentes admiten un prop `style` tipado con `StyleXStyles`, compuesto al final de `stylex.props`, y conservan las props nativas compatibles.
 - Los estados de foco, invalidez y deshabilitado son perceptibles y no dependen únicamente del color.
 - `client-demo` renderiza una muestra representativa y su build genera CSS para estilos procedentes de `@repo/ui`.
 - El CSS generado no contiene directivas `@stylex`.
@@ -46,7 +46,7 @@ El paquete compartido `@repo/ui` solo ofrece un botón completo y un `card.tsx` 
 ## Decisiones técnicas
 
 - Usar componentes nativos siempre que cubran el comportamiento requerido; en particular, preferir `NativeSelect` para no añadir una dependencia de primitivas complejas.
-- Mantener la misma estrategia de `forwardRef`, props explícitas y combinación segura de `className` que utiliza `button.tsx`.
+- Mantener `forwardRef`, props explícitas y composición oficial mediante `stylex.props(estilosLocales, style)` para que el último estilo gane de forma determinista.
 - El paquete compartido seguirá publicando código fuente TypeScript y StyleX mediante exports explícitos.
 - La configuración del compilador y las reglas StyleX seguirán centralizadas en los paquetes compartidos existentes.
 

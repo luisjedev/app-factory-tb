@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { forwardRef, type HTMLAttributes } from "react";
+import type { StyleableProps } from "./style-props";
 import { colors, effects, radii } from "./tokens.stylex";
 
 const styles = stylex.create({
@@ -42,36 +43,34 @@ const styles = stylex.create({
   },
 });
 
-export type CardProps = HTMLAttributes<HTMLDivElement>;
+export type CardProps = StyleableProps<HTMLAttributes<HTMLDivElement>>;
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
-  { className, ...props },
+  { style, ...props },
   ref,
 ) {
-  const styleProps = stylex.props(styles.card);
+  const styleProps = stylex.props(styles.card, style);
 
   return (
     <div
       {...props}
       {...styleProps}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="card"
       ref={ref}
     />
   );
 });
 
-export type CardHeaderProps = HTMLAttributes<HTMLDivElement>;
+export type CardHeaderProps = StyleableProps<HTMLAttributes<HTMLDivElement>>;
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
-  function CardHeader({ className, ...props }, ref) {
-    const styleProps = stylex.props(styles.header);
+  function CardHeader({ style, ...props }, ref) {
+    const styleProps = stylex.props(styles.header, style);
 
     return (
       <div
         {...props}
         {...styleProps}
-        className={[styleProps.className, className].filter(Boolean).join(" ")}
         data-slot="card-header"
         ref={ref}
       />
@@ -79,17 +78,16 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   },
 );
 
-export type CardTitleProps = HTMLAttributes<HTMLDivElement>;
+export type CardTitleProps = StyleableProps<HTMLAttributes<HTMLDivElement>>;
 
 export const CardTitle = forwardRef<HTMLDivElement, CardTitleProps>(
-  function CardTitle({ className, ...props }, ref) {
-    const styleProps = stylex.props(styles.title);
+  function CardTitle({ style, ...props }, ref) {
+    const styleProps = stylex.props(styles.title, style);
 
     return (
       <div
         {...props}
         {...styleProps}
-        className={[styleProps.className, className].filter(Boolean).join(" ")}
         data-slot="card-title"
         ref={ref}
       />
@@ -97,36 +95,36 @@ export const CardTitle = forwardRef<HTMLDivElement, CardTitleProps>(
   },
 );
 
-export type CardDescriptionProps = HTMLAttributes<HTMLDivElement>;
+export type CardDescriptionProps = StyleableProps<
+  HTMLAttributes<HTMLDivElement>
+>;
 
 export const CardDescription = forwardRef<
   HTMLDivElement,
   CardDescriptionProps
->(function CardDescription({ className, ...props }, ref) {
-  const styleProps = stylex.props(styles.description);
+>(function CardDescription({ style, ...props }, ref) {
+  const styleProps = stylex.props(styles.description, style);
 
   return (
     <div
       {...props}
       {...styleProps}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="card-description"
       ref={ref}
     />
   );
 });
 
-export type CardContentProps = HTMLAttributes<HTMLDivElement>;
+export type CardContentProps = StyleableProps<HTMLAttributes<HTMLDivElement>>;
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
-  function CardContent({ className, ...props }, ref) {
-    const styleProps = stylex.props(styles.content);
+  function CardContent({ style, ...props }, ref) {
+    const styleProps = stylex.props(styles.content, style);
 
     return (
       <div
         {...props}
         {...styleProps}
-        className={[styleProps.className, className].filter(Boolean).join(" ")}
         data-slot="card-content"
         ref={ref}
       />
@@ -134,17 +132,16 @@ export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   },
 );
 
-export type CardFooterProps = HTMLAttributes<HTMLDivElement>;
+export type CardFooterProps = StyleableProps<HTMLAttributes<HTMLDivElement>>;
 
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
-  function CardFooter({ className, ...props }, ref) {
-    const styleProps = stylex.props(styles.footer);
+  function CardFooter({ style, ...props }, ref) {
+    const styleProps = stylex.props(styles.footer, style);
 
     return (
       <div
         {...props}
         {...styleProps}
-        className={[styleProps.className, className].filter(Boolean).join(" ")}
         data-slot="card-footer"
         ref={ref}
       />

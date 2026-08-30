@@ -1,7 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 import { forwardRef, type LabelHTMLAttributes } from "react";
+import type { StyleableProps } from "./style-props";
 
-export type LabelProps = LabelHTMLAttributes<HTMLLabelElement>;
+export type LabelProps = StyleableProps<
+  LabelHTMLAttributes<HTMLLabelElement>
+>;
 
 const styles = stylex.create({
   base: {
@@ -16,16 +19,15 @@ const styles = stylex.create({
 });
 
 export const Label = forwardRef<HTMLLabelElement, LabelProps>(function Label(
-  { className, ...props },
+  { style, ...props },
   ref,
 ) {
-  const styleProps = stylex.props(styles.base);
+  const styleProps = stylex.props(styles.base, style);
 
   return (
     <label
       {...props}
       {...styleProps}
-      className={[styleProps.className, className].filter(Boolean).join(" ")}
       data-slot="label"
       ref={ref}
     />
