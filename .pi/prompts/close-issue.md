@@ -1,5 +1,5 @@
 ---
-description: Verifica, completa y sube una issue en revisión
+description: Verifica, publica, integra y completa una issue en revisión
 argument-hint: "[ID o nombre]"
 ---
 

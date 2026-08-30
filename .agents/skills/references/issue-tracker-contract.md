@@ -77,14 +77,20 @@ Un plan puede producir cero, una o muchas issues únicamente mediante `to-issues
 - `new-issue` o `to-issues`: crea en `backlog`.
 - `take-issue`: `backlog` → `in-progress`.
 - Implementación y revisión satisfactorias: `in-progress` → `in-review`.
-- `close-issue`, tras verificaciones y confirmación de push: `in-review` → `done`.
+- `close-issue` publica la rama y fusiona su PR mientras la issue permanece en `in-review`.
+- Solo después de confirmar el código en `origin/main`, `close-issue` realiza en `main` la transición `in-review` → `done` mediante un commit directo y lo sube sin force.
 - Mueve el mismo archivo; no copies ni dejes duplicados entre estados.
 
 ## Git
 
 - Trabajo nuevo: solo desde `main`, con árbol limpio.
 - Ramas: `fix/ISS-XXXX-slug` para `fix`; `feat/ISS-XXXX-slug` para `feature` y `chore`.
-- No hagas push, PR, merge, despliegue ni borres ramas sin el consentimiento específico previsto por el flujo.
+- No hagas operaciones remotas sin el consentimiento específico previsto por el flujo.
+- La confirmación de `take-issue` o `close-issue` autoriza como una sola operación: push de la rama actual, creación o reutilización de una PR hacia `main`, merge remoto tras checks satisfactorios, sincronización local de `main`, borrado de la rama fusionada y commit y push directo a `main` de la transición a `done`.
+- `close-issue` nunca duplica una PR, no elude protecciones y no continúa ante conflictos o checks fallidos.
+- La rama de trabajo local y remota se elimina únicamente después de confirmar su PR como fusionada.
+- El único commit directo permitido en `main` es el movimiento de la issue recién fusionada desde `in-review` hasta `done`; si el push es rechazado, no eludas la protección.
+- No hagas force-push ni despliegues como parte de este flujo.
 - La primera versión asume un único agente u operador activo y no implementa locks distribuidos.
 
 ## Integridad

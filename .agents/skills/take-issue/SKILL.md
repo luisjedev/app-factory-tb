@@ -47,8 +47,8 @@ Ante un fallo o interrupción, conserva `in-progress`, no hagas rollback destruc
 3. Cuando implementación, pruebas y revisión sean satisfactorias, mueve la issue de `in-progress` a `in-review`.
 4. Crea commits locales cohesionados. No hagas push todavía.
 5. Resume archivos, comportamiento, decisiones y verificaciones.
-6. Pregunta: **¿Quieres subir los cambios?**
+6. Pregunta: **¿Quieres publicar la rama, fusionar su PR en `main`, eliminar la rama y marcar la issue como `done` en `main`?**
    - Si no: deja la rama local y la issue en `in-review`.
-   - Si sí: carga y sigue `../close-issue/SKILL.md`; la confirmación ya dada autoriza el push de esa rama.
+   - Si sí: carga y sigue `../close-issue/SKILL.md`; la confirmación ya dada autoriza el push de la rama, la creación o reutilización de la PR, el merge remoto, el borrado de la rama local y remota, y el commit y push directo a `main` que mueve la issue a `done` después del merge.
 
-No crees PR, no hagas merge y no elimines ramas.
+No elimines ramas ni realices operaciones remotas fuera del flujo delegado a `close-issue`.

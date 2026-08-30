@@ -26,7 +26,7 @@ Complementar la aplicación con skills locales y alias de comandos que gobiernen
 - Descomponer un plan aprobado en issues verticales y explícitamente bloqueadas.
 - Seleccionar la siguiente issue disponible, crear su rama e implementar el trabajo.
 - Aplicar TDD en seams acordados y revisar el resultado contra estándares y especificación.
-- Cerrar y subir una issue únicamente después de confirmación expresa del usuario.
+- Cerrar, publicar e integrar una issue en `main` únicamente después de confirmación expresa del usuario.
 
 Todos los artefactos serán locales, legibles, versionables y portables con el repositorio.
 
@@ -74,12 +74,12 @@ Todos los artefactos serán locales, legibles, versionables y portables con el r
 40. Como agente implementador, quiero revisar el cambio contra los estándares del repositorio y la issue, para detectar desviaciones antes de darlo por terminado.
 41. Como agente implementador, quiero que una revisión con hallazgos bloqueantes vuelva a la implementación, para no avanzar una issue defectuosa.
 42. Como agente implementador, quiero que una implementación revisada pase a en revisión, para indicar que está lista para la decisión del usuario.
-43. Como usuario, quiero decidir explícitamente si se suben los cambios, para conservar control sobre operaciones remotas.
-44. Como usuario, quiero que rechazar la subida deje la rama y la issue en revisión de forma local, para poder retomarlas posteriormente.
-45. Como usuario, quiero que aceptar la subida invoque `/close-issue`, para centralizar verificaciones, cierre y push.
+43. Como usuario, quiero decidir explícitamente si se publican e integran los cambios, para conservar control sobre operaciones remotas.
+44. Como usuario, quiero que rechazar la publicación deje la rama y la issue en revisión de forma local, para poder retomarlas posteriormente.
+45. Como usuario, quiero que aceptar la publicación invoque `/close-issue`, para centralizar verificaciones, push, PR, merge a `main`, borrado de rama y cierre canónico.
 46. Como usuario, quiero invocar `/close-issue` directamente con un ID o inferirlo desde la rama, para cerrar trabajo pendiente en otra sesión.
 47. Como usuario, quiero que `/close-issue` se niegue a cerrar trabajo con verificaciones fallidas, para no publicar una rama defectuosa.
-48. Como usuario, quiero que una issue cerrada pase a completado y quede incluida en el commit y push de su rama, para que el estado llegue a `main` al integrar la rama.
+48. Como usuario, quiero que una issue pase a completado únicamente después de fusionar su código en `main`, para que el estado `done` nunca se adelante a la integración real.
 49. Como mantenedor, quiero que las skills necesarias viajen dentro del repositorio, para que el flujo no dependa de la configuración global de una máquina.
 50. Como usuario de Pi, quiero usar comandos cortos como `/new-issue` y `/take-issue`, para no depender de la sintaxis interna `/skill:<nombre>`.
 
@@ -114,10 +114,10 @@ Todos los artefactos serán locales, legibles, versionables y portables con el r
 - La revisión separará conformidad con estándares y conformidad con la especificación. Los hallazgos bloqueantes deberán resolverse antes de mover la issue a en revisión.
 - La revisión arquitectónica se aplicará únicamente cuando el alcance de la issue tenga consecuencias arquitectónicas reales; no será un paso obligatorio para cambios triviales.
 - Tras una revisión satisfactoria se moverá la issue a en revisión, se conservarán commits locales y se presentará el resumen final al usuario.
-- `/take-issue` preguntará si el usuario desea subir los cambios. Una respuesta negativa no ejecutará operaciones remotas y dejará el trabajo local en revisión.
-- Una respuesta afirmativa delegará en `/close-issue`. Esta skill validará rama, identidad y estado, ejecutará las comprobaciones acordadas, moverá la issue a completado, creará el commit final necesario y hará push de la rama.
-- `/close-issue` aceptará un ID o nombre y, sin argumentos, inferirá el ID desde la rama actual. Solo operará sobre trabajo en revisión.
-- La integración o creación de pull requests no formará parte de `/close-issue`. En `main`, el cambio de estado será visible cuando la rama se integre.
+- `/take-issue` preguntará si el usuario desea publicar la rama, fusionarla, eliminarla y completar la issue en `main`. Una respuesta negativa no ejecutará operaciones remotas y dejará el trabajo local en revisión.
+- Una respuesta afirmativa delegará en `/close-issue`. Esta skill validará rama, identidad y estado, ejecutará las comprobaciones acordadas, hará push, creará o reutilizará la PR y la fusionará automáticamente en `main` mientras la issue permanece en revisión.
+- `/close-issue` aceptará un ID o nombre y, sin argumentos, inferirá el ID desde la rama actual. Podrá reanudar desde `main` con ID explícito cuando el código ya esté fusionado y falte completar el cierre canónico.
+- Después de confirmar el merge remoto, `/close-issue` actualizará `main` mediante fast-forward, eliminará la rama local y remota, moverá la issue de `in-review` a `done` en `main`, creará un commit exclusivo para esa transición y lo subirá directamente sin force.
 - El flujo asumirá un único agente u operador tomando trabajo en esta primera versión; no se implementarán bloqueos distribuidos.
 - Las skills globales requeridas se copiarán como archivos reales, junto con sus referencias, y se adaptarán para eliminar dependencias de trackers externos, skills ausentes o subagentes no disponibles.
 - Las skills locales canónicas serán `new-issue`, `take-issue`, `close-issue`, `to-plan`, `to-issues`, `grilling`, `implement`, `tdd`, `code-review` e `improve-codebase-architecture`.
@@ -150,7 +150,7 @@ Todos los artefactos serán locales, legibles, versionables y portables con el r
 - Estados, archivado o ciclo de vida propio para planes.
 - Coordinación multiagente, locks, reservas remotas o prevención distribuida de selecciones duplicadas.
 - Base de datos, servidor persistente o servicio externo de issue tracking.
-- Creación automática de pull requests, merge a `main`, despliegue o eliminación de ramas.
+- Despliegue, force-push o elusión de protecciones.
 - Sincronización automática con futuras versiones de las skills globales originales.
 - Alcance específico de paquetes como tercera categoría distinta de general y aplicación.
 - Subtareas anidadas, épicas, estimaciones, asignados, comentarios o adjuntos.
