@@ -181,6 +181,28 @@ function formatDate(date: string) {
   }).format(new Date(`${date}T00:00:00Z`));
 }
 
+function DiagnosticList({
+  diagnostics,
+}: {
+  readonly diagnostics: readonly IssueDiagnostic[];
+}) {
+  return (
+    <ul {...stylex.props(styles.diagnosticList)}>
+      {diagnostics.map((diagnostic) => (
+        <li
+          {...stylex.props(styles.diagnosticItem)}
+          key={`${diagnostic.path}-${diagnostic.code}`}
+        >
+          <strong {...stylex.props(styles.diagnosticPath)}>
+            {diagnostic.path}
+          </strong>
+          <span>{diagnostic.message}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function IssueCard({ issue }: { readonly issue: Issue }) {
   const label = `${issue.id} ${issue.title}`;
 
@@ -243,19 +265,7 @@ export function IssueBoard({
           <AlertTitle>No se pudieron indexar issues</AlertTitle>
           <AlertDescription>
             Corrige las fuentes Markdown indicadas:
-            <ul {...stylex.props(styles.diagnosticList)}>
-              {diagnostics.map((diagnostic) => (
-                <li
-                  {...stylex.props(styles.diagnosticItem)}
-                  key={`${diagnostic.path}-${diagnostic.code}`}
-                >
-                  <strong {...stylex.props(styles.diagnosticPath)}>
-                    {diagnostic.path}
-                  </strong>
-                  <span>{diagnostic.message}</span>
-                </li>
-              ))}
-            </ul>
+            <DiagnosticList diagnostics={diagnostics} />
           </AlertDescription>
         </Alert>
       ) : null}
@@ -265,19 +275,7 @@ export function IssueBoard({
           <AlertTitle>Fuente parcialmente inválida</AlertTitle>
           <AlertDescription>
             Las issues válidas siguen disponibles. Corrige estos archivos:
-            <ul {...stylex.props(styles.diagnosticList)}>
-              {diagnostics.map((diagnostic) => (
-                <li
-                  {...stylex.props(styles.diagnosticItem)}
-                  key={`${diagnostic.path}-${diagnostic.code}`}
-                >
-                  <strong {...stylex.props(styles.diagnosticPath)}>
-                    {diagnostic.path}
-                  </strong>
-                  <span>{diagnostic.message}</span>
-                </li>
-              ))}
-            </ul>
+            <DiagnosticList diagnostics={diagnostics} />
           </AlertDescription>
         </Alert>
       ) : null}
