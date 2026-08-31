@@ -1,7 +1,7 @@
 import { themeStyles } from "@repo/ui/theme-styles";
 import { colors } from "@repo/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import issues from "virtual:issues";
+import issueRepository from "virtual:issues";
 import { IssueBoard } from "./board/IssueBoard";
 import { mediaQueries } from "./media.stylex";
 
@@ -72,12 +72,18 @@ export function App() {
           <p {...stylex.props(styles.summary)}>
             Tablero de solo lectura alimentado por los Markdown del repositorio.{" "}
             <span {...stylex.props(styles.total)}>
-              {issues.length} {issues.length === 1 ? "issue" : "issues"} en total.
+              {issueRepository.issues.length}{" "}
+              {issueRepository.issues.length === 1 ? "issue" : "issues"} en
+              total.
             </span>
           </p>
         </header>
 
-        <IssueBoard issues={issues} />
+        <IssueBoard
+          diagnostics={issueRepository.diagnostics}
+          issues={issueRepository.issues}
+          loadError={issueRepository.loadError}
+        />
       </div>
     </main>
   );
