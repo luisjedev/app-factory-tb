@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { IssueBoard } from "./IssueBoard";
 import type { Issue, IssueDiagnostic } from "../issues/types";
@@ -163,18 +164,30 @@ describe("IssueBoard", () => {
     expect(screen.getAllByText("0", { selector: "span" })).toHaveLength(4);
   });
 
-  it("abre y cierra el detalle completo con foco predecible", () => {
+  it("abre y cierra el detalle completo con teclado y foco predecible", async () => {
+    const user = userEvent.setup();
     render(<IssueBoard issues={issues} />);
 
     const openButton = screen.getByRole("button", {
       name: "Ver detalle de ISS-0002",
     });
-    openButton.focus();
+    const focusOrder = [
+      screen.getByRole("searchbox", { name: "Buscar issues" }),
+      screen.getByRole("combobox", { name: "Aplicación" }),
+      screen.getByRole("combobox", { name: "Tipo" }),
+      screen.getByRole("combobox", { name: "Prioridad" }),
+      screen.getByRole("button", { name: "Restablecer filtros" }),
+      openButton,
+    ];
 
-    expect(openButton).toHaveFocus();
+    for (const control of focusOrder) {
+      await user.tab();
+      expect(control).toHaveFocus();
+    }
+
     expect(openButton).toHaveAttribute("aria-expanded", "false");
 
-    fireEvent.click(openButton);
+    await user.keyboard("{Enter}");
 
     const detail = screen.getByRole("region", {
       name: "Detalle de ISS-0002",
@@ -185,13 +198,17 @@ describe("IssueBoard", () => {
       within(detail).getByRole("heading", { name: "Resultado esperado" }),
     ).toBeInTheDocument();
     expect(detail).toHaveTextContent("Especificación completa.");
+    expect(detail).toHaveTextContent("Clase Parte de plan");
+    expect(detail).toHaveTextContent("Tipo Feature");
+    expect(detail).toHaveTextContent("Prioridad alta");
+    expect(within(detail).getByText("30 ago 2026")).toBeInTheDocument();
     expect(detail).toHaveTextContent("Plan de origen PLAN-0001");
     expect(detail).toHaveTextContent("Bloqueada por ISS-0001");
 
     const closeButton = screen.getByRole("button", {
       name: "Ocultar detalle de ISS-0002",
     });
-    fireEvent.click(closeButton);
+    await user.keyboard("{Enter}");
 
     expect(closeButton).toHaveFocus();
     expect(closeButton).toHaveAttribute("aria-expanded", "false");
