@@ -18,45 +18,35 @@ Usa `workspace:*` para paquetes internos y `catalog:` para las herramientas cata
 
 ### 2. Babel
 
-Las apps de la fábrica son ESM. Consume la fábrica compartida y calcula únicamente el directorio propio:
+Las apps de la fábrica son ESM. La aplicación identifica su archivo de configuración y el adaptador deriva el directorio raíz y el modo de compilación:
 
 ```js
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { createNextStylexBabelConfig } from "@repo/stylex-config/babel";
 
-const rootDir = path.dirname(fileURLToPath(import.meta.url));
-
 export default createNextStylexBabelConfig({
-  dev: process.env.NODE_ENV !== "production",
-  rootDir,
+  configFileUrl: import.meta.url,
 });
 ```
 
-La fábrica compartida mantiene `runtimeInjection: false`, compensación de tree shaking, merge condicional y resolución de módulos. No copies esas opciones en la app.
+La fábrica compartida mantiene `runtimeInjection: false`, compensación de tree shaking, merge condicional y resolución de módulos. No copies esas opciones ni calcules `rootDir` o `dev` en la app.
 
 Añade `aliases` a la llamada solo cuando existan alias reales en TypeScript/bundler y usa rutas absolutas equivalentes. Si la app tiene otros plugins Babel, amplía el resultado de forma explícita sin sustituir la configuración StyleX.
 
 ### 3. PostCSS y cobertura
 
-Reutiliza exactamente el objeto Babel anterior y declara de forma explícita los directorios que realmente pueden producir estilos:
+Usa el adaptador compartido sin enlazar manualmente Babel ni declarar rutas físicas de paquetes:
 
 ```js
 import { createNextStylexPostcssConfig } from "@repo/stylex-config/postcss";
-import babelConfig from "./babel.config.js";
 
 export default createNextStylexPostcssConfig({
-  babelConfig,
-  include: [
-    "app/**/*.{js,jsx,ts,tsx}",
-    "../../packages/ui/src/**/*.{js,jsx,ts,tsx}",
-  ],
+  configFileUrl: import.meta.url,
 });
 ```
 
-Añade `src` o `components` solo si esos directorios existen. Añade cada paquete fuente del workspace que escriba StyleX y que la app consuma. No copies parser options, plugins PostCSS, Autoprefixer ni `useCSSLayers`: `@repo/stylex-config/postcss` ya los define.
+PostCSS descubre el código fuente de la aplicación y sus dependencias directas que declaran StyleX. Un paquete fuente compartido debe declarar `@stylexjs/stylex` y exportar `./package.json` para que el descubrimiento pueda inspeccionar su manifiesto.
 
-La lista explícita hace comprobable la cobertura de paquetes internos. Si faltan estilos, corrige `include` o los exports/dependencias del paquete; no dupliques componentes o tokens dentro de la app.
+No copies parser options, plugins PostCSS, Autoprefixer, `useCSSLayers` ni globs relativos como `../../packages/*/src`: `@repo/stylex-config/postcss` ya encapsula esas decisiones. Si faltan estilos, corrige el contrato público o las dependencias del paquete compartido; no filtres su ubicación interna ni dupliques estilos dentro de la app.
 
 ### 4. TypeScript
 
@@ -164,9 +154,9 @@ No asumas que el CSS de producción estará en `.next/static/css`; Next puede em
 ## Diagnóstico acotado
 
 - **`@stylex` permanece en el CSS:** confirma que Next cargó `postcss.config.js`, que el CSS global se importa una vez y que el archivo usa la fábrica compartida.
-- **El JS se transforma pero faltan reglas:** revisa los globs de `include` y que PostCSS reciba el mismo `babelConfig` exportado por Babel.
+- **El JS se transforma pero faltan reglas:** confirma que la dependencia compartida declara `@stylexjs/stylex`, exporta `./package.json` y puede resolverse desde la aplicación.
 - **Falla `defineVars`:** confirma `rootDir`, la extensión `*.stylex.ts` y que no se sustituyó la configuración compartida de resolución.
-- **Solo fallan estilos de `@repo/ui`:** añade su directorio fuente a `include` y confirma su dependencia directa de `@stylexjs/stylex`.
+- **Solo fallan estilos de `@repo/ui`:** confirma que la app lo declara directamente y que su manifiesto público declara `@stylexjs/stylex`.
 - **ESLint no reconoce StyleX:** confirma que se usa `@repo/eslint-config/next-js`; no añadas reglas locales como parche.
 - **TypeScript repite opciones de Next:** reduce el archivo a `extends`, `include`, `exclude` y overrides realmente específicos.
 

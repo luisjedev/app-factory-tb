@@ -48,6 +48,7 @@ Un paquete compartido que escriba StyleX debe:
 - Declarar `@stylexjs/stylex` directamente.
 - Consumir un preset ESLint compartido que incluya las reglas StyleX, como `@repo/eslint-config/react-internal`.
 - Publicar su fuente mediante exports explícitos.
+- Exportar `./package.json` para que los adaptadores puedan descubrir que declara StyleX sin conocer su ubicación física.
 - Estar cubierto por el compilador de cada aplicación consumidora. No necesita una integración de bundler propia salvo que se compile independientemente.
 
 **Criterio de finalización:** dependencias coherentes, presets compartidos consumidos, compilador cubriendo todas las fuentes, un único CSS raíz y ESLint analizando StyleX sin reglas duplicadas.

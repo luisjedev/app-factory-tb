@@ -1,6 +1,6 @@
 export interface NextStylexBabelOptions {
-  dev: boolean;
-  rootDir: string;
+  configFileUrl: string | URL;
+  dev?: boolean;
   aliases?: Record<string, string | string[]>;
 }
 

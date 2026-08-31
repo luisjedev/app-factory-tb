@@ -1,28 +1,21 @@
-import { stylexCssLayers } from "./shared.js";
+import { resolveConfigDirectory, stylexCssLayers } from "./shared.js";
 
 /**
  * @typedef {object} NextStylexPostcssOptions
- * @property {{ plugins?: unknown[] }} babelConfig
- * @property {string[]} include
+ * @property {string | URL} configFileUrl
  */
 
 /**
  * Creates the PostCSS configuration for a Next.js application.
+ * StyleX discovers the app sources and direct source-package dependencies.
  *
  * @param {NextStylexPostcssOptions} options
  */
-export function createNextStylexPostcssConfig({ babelConfig, include }) {
+export function createNextStylexPostcssConfig({ configFileUrl }) {
   return {
     plugins: {
       "@stylexjs/postcss-plugin": {
-        include,
-        babelConfig: {
-          babelrc: false,
-          parserOpts: {
-            plugins: ["typescript", "jsx"],
-          },
-          plugins: babelConfig.plugins ?? [],
-        },
+        cwd: resolveConfigDirectory(configFileUrl),
         useCSSLayers: stylexCssLayers,
       },
       autoprefixer: {},

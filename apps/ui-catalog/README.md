@@ -1,18 +1,24 @@
 # UI Catalog
 
-A living, framework-agnostic catalog for the components exported by `@repo/ui`.
-It shows the public variants of each component and acts as the visual reference
-for applications in this monorepo.
+Catálogo visual de los componentes exportados por `@repo/ui`.
 
-## Development
+## Responsabilidad
 
-From the repository root:
+- Mostrar la interface pública y las variantes disponibles de cada componente.
+- Validar la integración real de `@repo/ui` y StyleX desde una aplicación Vite.
+- Servir como referencia visual para las aplicaciones del monorepo.
+
+`ui-catalog` es una sección nativa independiente. El panel `web` proporcionará acceso a ella, pero no debe importar sus archivos internos.
+
+## Desarrollo
+
+Desde la raíz:
 
 ```bash
 pnpm --filter ui-catalog dev
 ```
 
-## Checks
+## Verificación
 
 ```bash
 pnpm --filter ui-catalog lint

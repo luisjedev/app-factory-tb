@@ -1,7 +1,10 @@
+import process from "node:process";
+import { resolveConfigDirectory } from "./shared.js";
+
 /**
  * @typedef {object} NextStylexBabelOptions
- * @property {boolean} dev
- * @property {string} rootDir
+ * @property {string | URL} configFileUrl
+ * @property {boolean} [dev]
  * @property {Record<string, string | string[]>} [aliases]
  */
 
@@ -10,7 +13,12 @@
  *
  * @param {NextStylexBabelOptions} options
  */
-export function createNextStylexBabelConfig({ dev, rootDir, aliases }) {
+export function createNextStylexBabelConfig({
+  configFileUrl,
+  dev = process.env.NODE_ENV !== "production",
+  aliases,
+}) {
+  const rootDir = resolveConfigDirectory(configFileUrl);
   return {
     presets: ["next/babel"],
     plugins: [

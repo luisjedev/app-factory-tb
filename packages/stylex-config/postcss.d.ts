@@ -1,8 +1,5 @@
-import type { NextStylexBabelConfig } from "./babel.js";
-
 export interface NextStylexPostcssOptions {
-  babelConfig: NextStylexBabelConfig;
-  include: string[];
+  configFileUrl: string | URL;
 }
 
 export function createNextStylexPostcssConfig(
