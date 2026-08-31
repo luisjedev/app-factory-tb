@@ -1,4 +1,5 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { IssueBoard } from "./IssueBoard";
 import type { Issue, IssueDiagnostic } from "../issues/types";
@@ -20,8 +21,9 @@ const issues: readonly Issue[] = [
     priority: "high",
     scope: "general",
     createdAt: "2026-08-30",
+    sourcePlan: "PLAN-0001",
     blockedBy: ["ISS-0001"],
-    content: "Especificación",
+    content: "## Resultado esperado\n\nEspecificación completa.",
     state: "in-progress",
   },
   {
@@ -39,7 +41,182 @@ const issues: readonly Issue[] = [
   },
 ];
 
+const filterIssues: readonly Issue[] = [
+  ...issues,
+  {
+    id: "ISS-0003",
+    title: "Corregir fuentes Markdown",
+    kind: "simple-task",
+    type: "fix",
+    priority: "low",
+    scope: "app",
+    app: "issues-tracker",
+    createdAt: "2026-08-31",
+    blockedBy: [],
+    content: "## Resultado esperado\n\nMostrar diagnósticos.",
+    state: "done",
+  },
+  {
+    id: "ISS-0004",
+    title: "Validar las skills locales",
+    kind: "simple-task",
+    type: "chore",
+    priority: "medium",
+    scope: "general",
+    createdAt: "2026-09-01",
+    blockedBy: [],
+    content: "## Resultado esperado\n\nValidar contratos.",
+    state: "backlog",
+  },
+];
+
 describe("IssueBoard", () => {
+  it("busca por ID o título sin distinguir mayúsculas y minúsculas", () => {
+    render(<IssueBoard issues={issues} />);
+
+    const search = screen.getByRole("searchbox", { name: "Buscar issues" });
+
+    fireEvent.change(search, { target: { value: "AMPLIAR" } });
+
+    expect(
+      screen.getByRole("article", {
+        name: "ISS-0001 Ampliar la interfaz compartida",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("article", {
+        name: "ISS-0002 Crear el tablero base",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "Completado" })).getByLabelText(
+        "1 issue en Completado",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "En progreso" })).getByLabelText(
+        "0 issues en En progreso",
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.change(search, { target: { value: "iss-0002" } });
+
+    expect(
+      screen.getByRole("article", {
+        name: "ISS-0002 Crear el tablero base",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("combina filtros y permite restablecer todos los criterios", () => {
+    render(<IssueBoard issues={filterIssues} />);
+
+    const appFilter = screen.getByRole("combobox", { name: "Aplicación" });
+    const typeFilter = screen.getByRole("combobox", { name: "Tipo" });
+    const priorityFilter = screen.getByRole("combobox", { name: "Prioridad" });
+
+    fireEvent.change(appFilter, { target: { value: "issues-tracker" } });
+    expect(screen.getAllByRole("article")).toHaveLength(1);
+    expect(screen.getByText("Corregir fuentes Markdown")).toBeInTheDocument();
+
+    fireEvent.change(appFilter, { target: { value: "" } });
+    fireEvent.change(typeFilter, { target: { value: "chore" } });
+    expect(screen.getAllByRole("article")).toHaveLength(1);
+    expect(screen.getByText("Validar las skills locales")).toBeInTheDocument();
+
+    fireEvent.change(typeFilter, { target: { value: "" } });
+    fireEvent.change(priorityFilter, { target: { value: "medium" } });
+    expect(screen.getAllByRole("article")).toHaveLength(2);
+
+    fireEvent.change(appFilter, { target: { value: "ui-catalog" } });
+    expect(screen.getAllByRole("article")).toHaveLength(1);
+    expect(screen.getByText("Ampliar la interfaz compartida")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole("searchbox", { name: "Buscar issues" }), {
+      target: { value: "sin coincidencia" },
+    });
+    expect(screen.queryAllByRole("article")).toHaveLength(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "Restablecer filtros" }));
+
+    expect(screen.getAllByRole("article")).toHaveLength(4);
+    expect(appFilter).toHaveValue("");
+    expect(typeFilter).toHaveValue("");
+    expect(priorityFilter).toHaveValue("");
+    expect(
+      screen.getByRole("searchbox", { name: "Buscar issues" }),
+    ).toHaveValue("");
+  });
+
+  it("distingue una consulta sin resultados del repositorio vacío", () => {
+    render(<IssueBoard issues={issues} />);
+
+    fireEvent.change(screen.getByRole("searchbox", { name: "Buscar issues" }), {
+      target: { value: "no existe" },
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "No hay issues que coincidan con los criterios activos",
+    );
+    expect(
+      screen.queryByText("Todavía no hay issues en el repositorio"),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByText("0", { selector: "span" })).toHaveLength(4);
+  });
+
+  it("abre y cierra el detalle completo con teclado y foco predecible", async () => {
+    const user = userEvent.setup();
+    render(<IssueBoard issues={issues} />);
+
+    const openButton = screen.getByRole("button", {
+      name: "Ver detalle de ISS-0002",
+    });
+    const focusOrder = [
+      screen.getByRole("searchbox", { name: "Buscar issues" }),
+      screen.getByRole("combobox", { name: "Aplicación" }),
+      screen.getByRole("combobox", { name: "Tipo" }),
+      screen.getByRole("combobox", { name: "Prioridad" }),
+      screen.getByRole("button", { name: "Restablecer filtros" }),
+      openButton,
+    ];
+
+    for (const control of focusOrder) {
+      await user.tab();
+      expect(control).toHaveFocus();
+    }
+
+    expect(openButton).toHaveAttribute("aria-expanded", "false");
+
+    await user.keyboard("{Enter}");
+
+    const detail = screen.getByRole("region", {
+      name: "Detalle de ISS-0002",
+    });
+    expect(openButton).toHaveFocus();
+    expect(openButton).toHaveAttribute("aria-expanded", "true");
+    expect(
+      within(detail).getByRole("heading", { name: "Resultado esperado" }),
+    ).toBeInTheDocument();
+    expect(detail).toHaveTextContent("Especificación completa.");
+    expect(detail).toHaveTextContent("Clase Parte de plan");
+    expect(detail).toHaveTextContent("Tipo Feature");
+    expect(detail).toHaveTextContent("Prioridad alta");
+    expect(within(detail).getByText("30 ago 2026")).toBeInTheDocument();
+    expect(detail).toHaveTextContent("Plan de origen PLAN-0001");
+    expect(detail).toHaveTextContent("Bloqueada por ISS-0001");
+
+    const closeButton = screen.getByRole("button", {
+      name: "Ocultar detalle de ISS-0002",
+    });
+    await user.keyboard("{Enter}");
+
+    expect(closeButton).toHaveFocus();
+    expect(closeButton).toHaveAttribute("aria-expanded", "false");
+    expect(
+      screen.queryByRole("region", { name: "Detalle de ISS-0002" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("muestra siempre las cuatro columnas con sus contadores y tarjetas", () => {
     render(<IssueBoard issues={issues} />);
 

@@ -1,5 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/alert";
 import { Badge, type BadgeVariant } from "@repo/ui/badge";
+import { Button } from "@repo/ui/button";
 import {
   Card,
   CardContent,
@@ -8,6 +9,7 @@ import {
 } from "@repo/ui/card";
 import { colors, radii } from "@repo/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
+import { useState } from "react";
 import { mediaQueries } from "../media.stylex";
 import {
   ISSUE_STATES,
@@ -15,13 +17,16 @@ import {
   type IssueDiagnostic,
   type IssueState,
 } from "../issues/types";
-
-const STATE_LABELS: Readonly<Record<IssueState, string>> = {
-  backlog: "Backlog",
-  "in-progress": "En progreso",
-  "in-review": "En revisión",
-  done: "Completado",
-};
+import { IssueDetail } from "./IssueDetail";
+import {
+  IssueFilters,
+  type IssueFilterValue,
+} from "./IssueFilters";
+import {
+  PRIORITY_LABELS,
+  STATE_LABELS,
+  TYPE_LABELS,
+} from "./issue-labels";
 
 const EMPTY_STATE_LABELS: Readonly<Record<IssueState, string>> = {
   backlog: "el backlog",
@@ -29,18 +34,6 @@ const EMPTY_STATE_LABELS: Readonly<Record<IssueState, string>> = {
   "in-review": "revisión",
   done: "completado",
 };
-
-const PRIORITY_LABELS = {
-  high: "Prioridad alta",
-  medium: "Prioridad media",
-  low: "Prioridad baja",
-} as const;
-
-const TYPE_LABELS = {
-  feature: "Feature",
-  fix: "Fix",
-  chore: "Chore",
-} as const;
 
 const PRIORITY_VARIANTS: Readonly<
   Record<Issue["priority"], BadgeVariant>
@@ -160,6 +153,9 @@ const styles = stylex.create({
     color: colors.mutedForeground,
     fontSize: "0.75rem",
   },
+  detailButton: {
+    width: "100%",
+  },
   columnEmpty: {
     color: colors.mutedForeground,
     fontSize: "0.8125rem",
@@ -203,8 +199,19 @@ function DiagnosticList({
   );
 }
 
-function IssueCard({ issue }: { readonly issue: Issue }) {
+function IssueCard({
+  expanded,
+  issue,
+  issues,
+  onToggle,
+}: {
+  readonly expanded: boolean;
+  readonly issue: Issue;
+  readonly issues: readonly Issue[];
+  readonly onToggle: () => void;
+}) {
   const label = `${issue.id} ${issue.title}`;
+  const detailId = `detail-${issue.id}`;
 
   return (
     <Card aria-label={label} role="article" style={styles.issueCard}>
@@ -228,6 +235,19 @@ function IssueCard({ issue }: { readonly issue: Issue }) {
         <time dateTime={issue.createdAt} {...stylex.props(styles.date)}>
           {formatDate(issue.createdAt)}
         </time>
+        <Button
+          aria-controls={detailId}
+          aria-expanded={expanded}
+          onClick={onToggle}
+          size="sm"
+          style={styles.detailButton}
+          variant="outline"
+        >
+          {expanded ? "Ocultar" : "Ver"} detalle de {issue.id}
+        </Button>
+        {expanded ? (
+          <IssueDetail id={detailId} issue={issue} issues={issues} />
+        ) : null}
       </CardContent>
     </Card>
   );
@@ -244,15 +264,49 @@ export function IssueBoard({
   issues,
   loadError,
 }: IssueBoardProps) {
+  const [filters, setFilters] = useState<IssueFilterValue>({
+    app: "",
+    priority: "",
+    query: "",
+    type: "",
+  });
+  const [expandedIssueId, setExpandedIssueId] = useState<string | null>(null);
+  const normalizedQuery = filters.query.trim().toLocaleLowerCase("es");
+  const appOptions = Array.from(
+    new Set(issues.flatMap((issue) => (issue.app ? [issue.app] : []))),
+  ).sort((left, right) => left.localeCompare(right, "es"));
+  const visibleIssues = issues.filter(
+    (issue) =>
+      (!normalizedQuery ||
+        `${issue.id} ${issue.title}`
+          .toLocaleLowerCase("es")
+          .includes(normalizedQuery)) &&
+      (!filters.app || issue.app === filters.app) &&
+      (!filters.type || issue.type === filters.type) &&
+      (!filters.priority || issue.priority === filters.priority),
+  );
   const issuesByState: Record<IssueState, readonly Issue[]> = {
-    backlog: issues.filter((issue) => issue.state === "backlog"),
-    "in-progress": issues.filter((issue) => issue.state === "in-progress"),
-    "in-review": issues.filter((issue) => issue.state === "in-review"),
-    done: issues.filter((issue) => issue.state === "done"),
+    backlog: visibleIssues.filter((issue) => issue.state === "backlog"),
+    "in-progress": visibleIssues.filter(
+      (issue) => issue.state === "in-progress",
+    ),
+    "in-review": visibleIssues.filter((issue) => issue.state === "in-review"),
+    done: visibleIssues.filter((issue) => issue.state === "done"),
   };
 
   return (
     <>
+      {issues.length > 0 ? (
+        <IssueFilters
+          apps={appOptions}
+          onChange={setFilters}
+          onReset={() =>
+            setFilters({ app: "", priority: "", query: "", type: "" })
+          }
+          value={filters}
+        />
+      ) : null}
+
       {loadError ? (
         <Alert variant="destructive" style={styles.emptyState}>
           <AlertTitle>No se pudo cargar el repositorio</AlertTitle>
@@ -289,6 +343,18 @@ export function IssueBoard({
         </Alert>
       ) : null}
 
+      {!loadError && issues.length > 0 && visibleIssues.length === 0 ? (
+        <Alert role="status" style={styles.emptyState}>
+          <AlertTitle>
+            No hay issues que coincidan con los criterios activos
+          </AlertTitle>
+          <AlertDescription>
+            Modifica la búsqueda o restablece los filtros para recuperar el
+            tablero completo.
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <div {...stylex.props(styles.board)}>
         {ISSUE_STATES.map((state) => {
           const stateIssues = issuesByState[state];
@@ -317,7 +383,16 @@ export function IssueBoard({
                 <ol {...stylex.props(styles.issueList)}>
                   {stateIssues.map((issue) => (
                     <li key={issue.id}>
-                      <IssueCard issue={issue} />
+                      <IssueCard
+                        expanded={expandedIssueId === issue.id}
+                        issue={issue}
+                        issues={issues}
+                        onToggle={() =>
+                          setExpandedIssueId((currentId) =>
+                            currentId === issue.id ? null : issue.id,
+                          )
+                        }
+                      />
                     </li>
                   ))}
                 </ol>
