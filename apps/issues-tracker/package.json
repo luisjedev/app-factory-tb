@@ -1,0 +1,38 @@
+{
+  "name": "issues-tracker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc -b",
+    "test": "vitest run",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@repo/ui": "workspace:*",
+    "@stylexjs/stylex": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/stylex-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@stylexjs/unplugin": "catalog:",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "^6.1.0",
+    "eslint": "catalog:",
+    "jsdom": "^30.0.1",
+    "typescript": "catalog:",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}
