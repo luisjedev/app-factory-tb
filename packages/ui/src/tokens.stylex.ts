@@ -40,34 +40,27 @@ export const colors = stylex.defineVars({
 });
 
 /** Derived colors remain synchronized when a parent color theme changes. */
-export const effects = stylex.defineVars({
-  destructiveHover: () =>
-    `color-mix(in srgb, ${colors.destructive} 90%, transparent)`,
-  focusRing: () =>
-    `color-mix(in srgb, ${colors.ring} 50%, transparent)`,
-  focusRingShadow: () =>
-    `0 0 0 3px color-mix(in srgb, ${colors.ring} 50%, transparent)`,
-  invalidFocusRing: () =>
-    `0 0 0 3px color-mix(in srgb, ${colors.destructive} 35%, transparent)`,
-  invalidRing: () =>
-    `0 0 0 1px color-mix(in srgb, ${colors.destructive} 35%, transparent)`,
-  primaryHover: () =>
-    `color-mix(in srgb, ${colors.primary} 90%, transparent)`,
-  secondaryHover: () =>
-    `color-mix(in srgb, ${colors.secondary} 80%, transparent)`,
+export const effects = stylex.defineConsts({
+  destructiveHover: `color-mix(in srgb, ${colors.destructive} 90%, transparent)`,
+  focusRing: `color-mix(in srgb, ${colors.ring} 50%, transparent)`,
+  focusRingShadow: `0 0 0 3px color-mix(in srgb, ${colors.ring} 50%, transparent)`,
+  invalidFocusRing: `0 0 0 3px color-mix(in srgb, ${colors.destructive} 35%, transparent)`,
+  invalidRing: `0 0 0 1px color-mix(in srgb, ${colors.destructive} 35%, transparent)`,
+  primaryHover: `color-mix(in srgb, ${colors.primary} 90%, transparent)`,
+  secondaryHover: `color-mix(in srgb, ${colors.secondary} 80%, transparent)`,
   shadowSm: "0 1px 2px rgb(0 0 0 / 0.05)",
 });
 
-export const radiusBase = stylex.defineVars({
+export const radiusBase = stylex.defineConsts({
   value: "0.625rem",
 });
 
-export const radii = stylex.defineVars({
-  sm: () => `calc(${radiusBase.value} * 0.6)`,
-  md: () => `calc(${radiusBase.value} * 0.8)`,
-  lg: () => radiusBase.value,
-  xl: () => `calc(${radiusBase.value} * 1.4)`,
-  xxl: () => `calc(${radiusBase.value} * 1.8)`,
-  xxxl: () => `calc(${radiusBase.value} * 2.2)`,
-  xxxxl: () => `calc(${radiusBase.value} * 2.6)`,
+export const radii = stylex.defineConsts({
+  sm: `calc(${radiusBase.value} * 0.6)`,
+  md: `calc(${radiusBase.value} * 0.8)`,
+  lg: radiusBase.value,
+  xl: `calc(${radiusBase.value} * 1.4)`,
+  xxl: `calc(${radiusBase.value} * 1.8)`,
+  xxxl: `calc(${radiusBase.value} * 2.2)`,
+  xxxxl: `calc(${radiusBase.value} * 2.6)`,
 });

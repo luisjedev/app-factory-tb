@@ -10,6 +10,7 @@
     "./code": "./src/code.tsx",
     "./input": "./src/input.tsx",
     "./label": "./src/label.tsx",
+    "./media.stylex": "./src/media.stylex.ts",
     "./native-select": "./src/native-select.tsx",
     "./reset.css": "./src/reset.css",
     "./theme-styles": "./src/theme-styles.ts",
@@ -24,9 +25,6 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@stylexjs/babel-plugin": "catalog:",
-    "@stylexjs/postcss-plugin": "catalog:",
-    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",

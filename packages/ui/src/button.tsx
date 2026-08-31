@@ -24,8 +24,6 @@ export type ButtonSize =
 export type ButtonProps = StyleableProps<
   ButtonHTMLAttributes<HTMLButtonElement>
 > & {
-  /** Conservado por compatibilidad con los ejemplos del monorepo. */
-  appName?: string;
   size?: ButtonSize;
   variant?: ButtonVariant;
 };
@@ -160,9 +158,7 @@ const styles = stylex.create({
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
-      appName,
       children,
-      onClick,
       style,
       size = "default",
       type = "button",
@@ -200,13 +196,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-variant={variant}
         ref={ref}
         type={type}
-        onClick={(event) => {
-          onClick?.(event);
-
-          if (appName && !event.defaultPrevented) {
-            alert(`Hello from your ${appName} app!`);
-          }
-        }}
       >
         {children}
       </button>
