@@ -16,6 +16,11 @@ export function defineVars<Variables extends Record<string, string>>(
   return variables;
 }
 
+export function keyframes(frames: Record<string, unknown>): string {
+  void frames;
+  return "mock-keyframes";
+}
+
 export function props(...styles: readonly unknown[]): Record<string, never> {
   void styles;
   return {};

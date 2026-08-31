@@ -1,5 +1,6 @@
-import { colors } from "@repo/ui/tokens.stylex";
+import { colors, radii } from "@repo/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 import type { Issue } from "../issues/types";
 import {
   KIND_LABELS,
@@ -21,47 +22,90 @@ type IssueDetailProps = {
 
 const styles = stylex.create({
   detail: {
-    borderBlockStartColor: colors.border,
-    borderBlockStartStyle: "solid",
-    borderBlockStartWidth: "1px",
+    display: "grid",
+    gap: "2rem",
+    minHeight: 0,
+    overflowWrap: "anywhere",
+    overflowY: "auto",
+    paddingBlockEnd: "0.5rem",
+    paddingInlineEnd: "0.5rem",
+  },
+  detailSection: {
     display: "grid",
     gap: "1rem",
-    overflowWrap: "anywhere",
-    paddingBlockStart: "1rem",
+  },
+  sectionHeading: {
+    fontSize: "1.125rem",
+    fontWeight: 650,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.3,
+    margin: 0,
   },
   metadata: {
     display: "grid",
-    gap: "0.5rem",
+    gap: "0.75rem",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 14rem), 1fr))",
     listStyle: "none",
     margin: 0,
     padding: 0,
   },
   metadataItem: {
+    backgroundColor: colors.muted,
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    borderStyle: "solid",
+    borderWidth: "1px",
+    display: "grid",
+    gap: "0.35rem",
+    minHeight: "5rem",
+    paddingBlock: "1rem",
+    paddingInline: "1rem",
+  },
+  metadataLabel: {
     color: colors.mutedForeground,
     fontSize: "0.75rem",
-    lineHeight: 1.5,
+    fontWeight: 700,
+    letterSpacing: "0.07em",
+    lineHeight: 1.3,
+    textTransform: "uppercase",
+  },
+  metadataValue: {
+    color: colors.foreground,
+    fontSize: "1rem",
+    fontWeight: 600,
+    lineHeight: 1.4,
+  },
+  descriptionSection: {
+    borderBlockStartColor: colors.border,
+    borderBlockStartStyle: "solid",
+    borderBlockStartWidth: "1px",
+    display: "grid",
+    gap: "1.25rem",
+    paddingBlockStart: "1.5rem",
   },
   content: {
     display: "grid",
-    gap: "0.75rem",
+    gap: "1rem",
+    maxWidth: "75rem",
   },
   heading: {
-    fontSize: "0.875rem",
+    fontSize: "1.125rem",
+    fontWeight: 650,
     lineHeight: 1.4,
     margin: 0,
   },
   paragraph: {
-    fontSize: "0.8125rem",
-    lineHeight: 1.6,
+    fontSize: "1rem",
+    lineHeight: 1.75,
     margin: 0,
   },
   list: {
     display: "grid",
-    fontSize: "0.8125rem",
-    gap: "0.35rem",
-    lineHeight: 1.5,
+    fontSize: "1rem",
+    gap: "0.6rem",
+    lineHeight: 1.65,
     margin: 0,
-    paddingInlineStart: "1.25rem",
+    paddingInlineStart: "1.5rem",
   },
 });
 
@@ -72,6 +116,26 @@ function formatDate(date: string) {
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(`${date}T00:00:00Z`));
+}
+
+function formatPriority(priority: Issue["priority"]) {
+  const value = PRIORITY_LABELS[priority].replace("Prioridad ", "");
+  return `${value.charAt(0).toLocaleUpperCase("es")}${value.slice(1)}`;
+}
+
+function MetadataItem({
+  children,
+  label,
+}: {
+  readonly children: ReactNode;
+  readonly label: string;
+}) {
+  return (
+    <li {...stylex.props(styles.metadataItem)}>
+      <span {...stylex.props(styles.metadataLabel)}>{label}</span>
+      <span {...stylex.props(styles.metadataValue)}>{children}</span>
+    </li>
+  );
 }
 
 function parseIssueContent(content: string): readonly IssueContentBlock[] {
@@ -113,7 +177,11 @@ function parseIssueContent(content: string): readonly IssueContentBlock[] {
     while (index < lines.length) {
       const nextLine = lines[index]?.trim() ?? "";
 
-      if (!nextLine || /^#{1,6}\s+/.test(nextLine) || nextLine.startsWith("- ")) {
+      if (
+        !nextLine ||
+        /^#{1,6}\s+/.test(nextLine) ||
+        nextLine.startsWith("- ")
+      ) {
         break;
       }
 
@@ -170,52 +238,50 @@ export function IssueDetail({ id, issue, issues }: IssueDetailProps) {
       aria-label={`Detalle de ${issue.id}`}
       id={id}
     >
-      <ul {...stylex.props(styles.metadata)}>
-        <li {...stylex.props(styles.metadataItem)}>
-          Identificador <strong>{issue.id}</strong>
-        </li>
-        <li {...stylex.props(styles.metadataItem)}>
-          Estado <strong>{STATE_LABELS[issue.state]}</strong>
-        </li>
-        <li {...stylex.props(styles.metadataItem)}>
-          Clase <strong>{KIND_LABELS[issue.kind]}</strong>
-        </li>
-        <li {...stylex.props(styles.metadataItem)}>
-          Tipo <strong>{TYPE_LABELS[issue.type]}</strong>
-        </li>
-        <li {...stylex.props(styles.metadataItem)}>
-          <strong>{PRIORITY_LABELS[issue.priority]}</strong>
-        </li>
-        <li {...stylex.props(styles.metadataItem)}>
-          Creada el{" "}
-          <time dateTime={issue.createdAt}>{formatDate(issue.createdAt)}</time>
-        </li>
-        <li {...stylex.props(styles.metadataItem)}>
-          Alcance{" "}
-          <strong>{issue.scope === "general" ? "General" : issue.app}</strong>
-        </li>
-        {issue.sourcePlan ? (
-          <li {...stylex.props(styles.metadataItem)}>
-            Plan de origen <strong>{issue.sourcePlan}</strong>
-          </li>
-        ) : null}
-        {issue.blockedBy.length > 0 ? (
-          <li {...stylex.props(styles.metadataItem)}>
-            Bloqueada por <strong>{issue.blockedBy.join(", ")}</strong>
-          </li>
-        ) : null}
-        {blockingIssues.length > 0 ? (
-          <li {...stylex.props(styles.metadataItem)}>
-            Bloquea a <strong>{blockingIssues.join(", ")}</strong>
-          </li>
-        ) : null}
-        {issue.blockedBy.length === 0 && blockingIssues.length === 0 ? (
-          <li {...stylex.props(styles.metadataItem)}>
-            Sin relaciones de bloqueo
-          </li>
-        ) : null}
-      </ul>
-      <IssueContent content={issue.content} />
+      <div {...stylex.props(styles.detailSection)}>
+        <h3 {...stylex.props(styles.sectionHeading)}>Datos de la issue</h3>
+        <ul {...stylex.props(styles.metadata)}>
+          <MetadataItem label="Identificador">{issue.id}</MetadataItem>
+          <MetadataItem label="Estado">
+            {STATE_LABELS[issue.state]}
+          </MetadataItem>
+          <MetadataItem label="Clase">{KIND_LABELS[issue.kind]}</MetadataItem>
+          <MetadataItem label="Tipo">{TYPE_LABELS[issue.type]}</MetadataItem>
+          <MetadataItem label="Prioridad">
+            {formatPriority(issue.priority)}
+          </MetadataItem>
+          <MetadataItem label="Fecha de creación">
+            <time dateTime={issue.createdAt}>
+              {formatDate(issue.createdAt)}
+            </time>
+          </MetadataItem>
+          <MetadataItem label="Alcance">
+            {issue.scope === "general" ? "General" : issue.app}
+          </MetadataItem>
+          {issue.sourcePlan ? (
+            <MetadataItem label="Plan de origen">
+              {issue.sourcePlan}
+            </MetadataItem>
+          ) : null}
+          {issue.blockedBy.length > 0 ? (
+            <MetadataItem label="Bloqueada por">
+              {issue.blockedBy.join(", ")}
+            </MetadataItem>
+          ) : null}
+          {blockingIssues.length > 0 ? (
+            <MetadataItem label="Bloquea a">
+              {blockingIssues.join(", ")}
+            </MetadataItem>
+          ) : null}
+          {issue.blockedBy.length === 0 && blockingIssues.length === 0 ? (
+            <MetadataItem label="Relaciones">Sin bloqueos</MetadataItem>
+          ) : null}
+        </ul>
+      </div>
+      <div {...stylex.props(styles.descriptionSection)}>
+        <h3 {...stylex.props(styles.sectionHeading)}>Descripción</h3>
+        <IssueContent content={issue.content} />
+      </div>
     </section>
   );
 }

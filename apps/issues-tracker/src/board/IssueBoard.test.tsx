@@ -94,9 +94,9 @@ describe("IssueBoard", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      within(screen.getByRole("region", { name: "En progreso" })).getByLabelText(
-        "0 issues en En progreso",
-      ),
+      within(
+        screen.getByRole("region", { name: "En progreso" }),
+      ).getByLabelText("0 issues en En progreso"),
     ).toBeInTheDocument();
 
     fireEvent.change(search, { target: { value: "iss-0002" } });
@@ -130,14 +130,18 @@ describe("IssueBoard", () => {
 
     fireEvent.change(appFilter, { target: { value: "ui-catalog" } });
     expect(screen.getAllByRole("article")).toHaveLength(1);
-    expect(screen.getByText("Ampliar la interfaz compartida")).toBeInTheDocument();
+    expect(
+      screen.getByText("Ampliar la interfaz compartida"),
+    ).toBeInTheDocument();
 
     fireEvent.change(screen.getByRole("searchbox", { name: "Buscar issues" }), {
       target: { value: "sin coincidencia" },
     });
     expect(screen.queryAllByRole("article")).toHaveLength(0);
 
-    fireEvent.click(screen.getByRole("button", { name: "Restablecer filtros" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Restablecer filtros" }),
+    );
 
     expect(screen.getAllByRole("article")).toHaveLength(4);
     expect(appFilter).toHaveValue("");
@@ -164,7 +168,7 @@ describe("IssueBoard", () => {
     expect(screen.getAllByText("0", { selector: "span" })).toHaveLength(4);
   });
 
-  it("abre y cierra el detalle completo con teclado y foco predecible", async () => {
+  it("abre el detalle completo en una modal y devuelve el foco al cerrarla", async () => {
     const user = userEvent.setup();
     render(<IssueBoard issues={issues} />);
 
@@ -185,36 +189,46 @@ describe("IssueBoard", () => {
       expect(control).toHaveFocus();
     }
 
-    expect(openButton).toHaveAttribute("aria-expanded", "false");
-
     await user.keyboard("{Enter}");
 
-    const detail = screen.getByRole("region", {
+    const dialog = screen.getByRole("dialog", {
+      name: "ISS-0002 Crear el tablero base",
+    });
+    const detail = within(dialog).getByRole("region", {
       name: "Detalle de ISS-0002",
     });
-    expect(openButton).toHaveFocus();
-    expect(openButton).toHaveAttribute("aria-expanded", "true");
+    expect(
+      within(dialog).getByText(
+        "Detalle completo, relaciones y descripción de la issue",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(detail).getByRole("heading", { name: "Descripción" }),
+    ).toBeInTheDocument();
     expect(
       within(detail).getByRole("heading", { name: "Resultado esperado" }),
     ).toBeInTheDocument();
     expect(detail).toHaveTextContent("Especificación completa.");
-    expect(detail).toHaveTextContent("Clase Parte de plan");
-    expect(detail).toHaveTextContent("Tipo Feature");
-    expect(detail).toHaveTextContent("Prioridad alta");
+    expect(within(detail).getByText("Parte de plan")).toBeInTheDocument();
+    expect(within(detail).getByText("Feature")).toBeInTheDocument();
+    expect(within(detail).getByText("Alta")).toBeInTheDocument();
     expect(within(detail).getByText("30 ago 2026")).toBeInTheDocument();
-    expect(detail).toHaveTextContent("Plan de origen PLAN-0001");
-    expect(detail).toHaveTextContent("Bloqueada por ISS-0001");
+    expect(within(detail).getByText("PLAN-0001")).toBeInTheDocument();
+    expect(within(detail).getByText("ISS-0001")).toBeInTheDocument();
 
-    const closeButton = screen.getByRole("button", {
-      name: "Ocultar detalle de ISS-0002",
+    const closeButton = within(dialog).getByRole("button", {
+      name: "Cerrar",
     });
+    expect(closeButton).toHaveFocus();
+
     await user.keyboard("{Enter}");
 
-    expect(closeButton).toHaveFocus();
-    expect(closeButton).toHaveAttribute("aria-expanded", "false");
     expect(
-      screen.queryByRole("region", { name: "Detalle de ISS-0002" }),
+      screen.queryByRole("dialog", {
+        name: "ISS-0002 Crear el tablero base",
+      }),
     ).not.toBeInTheDocument();
+    expect(openButton).toHaveFocus();
   });
 
   it("muestra siempre las cuatro columnas con sus contadores y tarjetas", () => {
@@ -254,9 +268,7 @@ describe("IssueBoard", () => {
 
     const status = screen.getByRole("status");
     expect(status).toHaveTextContent("Fuente parcialmente inválida");
-    expect(status).toHaveTextContent(
-      "issues/backlog/ISS-0003--invalida.md",
-    );
+    expect(status).toHaveTextContent("issues/backlog/ISS-0003--invalida.md");
     expect(status).toHaveTextContent(
       'El bloqueador "ISS-9999" no referencia una issue existente.',
     );

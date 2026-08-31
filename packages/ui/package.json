@@ -8,6 +8,7 @@
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
     "./code": "./src/code.tsx",
+    "./dialog": "./src/dialog.tsx",
     "./input": "./src/input.tsx",
     "./label": "./src/label.tsx",
     "./media.stylex": "./src/media.stylex.ts",
@@ -32,6 +33,7 @@
     "typescript": "catalog:"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.23",
     "@stylexjs/stylex": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

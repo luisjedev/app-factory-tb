@@ -36,8 +36,6 @@ const styles = stylex.create({
   root: {
     backgroundColor: colors.background,
     backgroundImage: `linear-gradient(180deg, ${colors.muted} 0, ${colors.background} 24rem)`,
-    fontFamily:
-      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     paddingBlock: {
       default: "4rem",
       [mediaQueries.compact]: "2rem",

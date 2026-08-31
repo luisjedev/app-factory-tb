@@ -51,6 +51,11 @@ export const effects = stylex.defineConsts({
   shadowSm: "0 1px 2px rgb(0 0 0 / 0.05)",
 });
 
+export const typography = stylex.defineConsts({
+  sans: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+});
+
 export const radiusBase = stylex.defineConsts({
   value: "0.625rem",
 });

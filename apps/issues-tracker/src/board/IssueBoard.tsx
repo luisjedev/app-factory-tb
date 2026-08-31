@@ -1,13 +1,16 @@
 import { Alert, AlertDescription, AlertTitle } from "@repo/ui/alert";
 import { Badge, type BadgeVariant } from "@repo/ui/badge";
 import { Button } from "@repo/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/card";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/card";
-import { colors, radii } from "@repo/ui/tokens.stylex";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@repo/ui/dialog";
+import { colors, radii, typography } from "@repo/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
 import { mediaQueries } from "../media.stylex";
@@ -18,15 +21,8 @@ import {
   type IssueState,
 } from "../issues/types";
 import { IssueDetail } from "./IssueDetail";
-import {
-  IssueFilters,
-  type IssueFilterValue,
-} from "./IssueFilters";
-import {
-  PRIORITY_LABELS,
-  STATE_LABELS,
-  TYPE_LABELS,
-} from "./issue-labels";
+import { IssueFilters, type IssueFilterValue } from "./IssueFilters";
+import { PRIORITY_LABELS, STATE_LABELS, TYPE_LABELS } from "./issue-labels";
 
 const EMPTY_STATE_LABELS: Readonly<Record<IssueState, string>> = {
   backlog: "el backlog",
@@ -35,9 +31,7 @@ const EMPTY_STATE_LABELS: Readonly<Record<IssueState, string>> = {
   done: "completado",
 };
 
-const PRIORITY_VARIANTS: Readonly<
-  Record<Issue["priority"], BadgeVariant>
-> = {
+const PRIORITY_VARIANTS: Readonly<Record<Issue["priority"], BadgeVariant>> = {
   high: "destructive",
   medium: "default",
   low: "secondary",
@@ -59,7 +53,7 @@ const styles = stylex.create({
     gap: "0.125rem",
   },
   diagnosticPath: {
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+    fontFamily: typography.mono,
     fontSize: "0.75rem",
     overflowWrap: "anywhere",
   },
@@ -156,6 +150,31 @@ const styles = stylex.create({
   detailButton: {
     width: "100%",
   },
+  issueDialog: {
+    gridTemplateRows: "auto minmax(0, 1fr)",
+    height: {
+      default: "calc(100dvh - 2rem)",
+      [mediaQueries.compact]: "calc(100dvh - 1rem)",
+    },
+    maxHeight: {
+      default: "calc(100dvh - 2rem)",
+      [mediaQueries.compact]: "calc(100dvh - 1rem)",
+    },
+    maxWidth: "90rem",
+    overflowY: "hidden",
+    width: {
+      default: "calc(100vw - 2rem)",
+      [mediaQueries.compact]: "calc(100vw - 1rem)",
+    },
+  },
+  dialogTitle: {
+    fontSize: {
+      default: "1.75rem",
+      [mediaQueries.compact]: "1.35rem",
+    },
+    letterSpacing: "-0.035em",
+    lineHeight: 1.15,
+  },
   columnEmpty: {
     color: colors.mutedForeground,
     fontSize: "0.8125rem",
@@ -200,15 +219,11 @@ function DiagnosticList({
 }
 
 function IssueCard({
-  expanded,
   issue,
   issues,
-  onToggle,
 }: {
-  readonly expanded: boolean;
   readonly issue: Issue;
   readonly issues: readonly Issue[];
-  readonly onToggle: () => void;
 }) {
   const label = `${issue.id} ${issue.title}`;
   const detailId = `detail-${issue.id}`;
@@ -235,19 +250,27 @@ function IssueCard({
         <time dateTime={issue.createdAt} {...stylex.props(styles.date)}>
           {formatDate(issue.createdAt)}
         </time>
-        <Button
-          aria-controls={detailId}
-          aria-expanded={expanded}
-          onClick={onToggle}
-          size="sm"
-          style={styles.detailButton}
-          variant="outline"
-        >
-          {expanded ? "Ocultar" : "Ver"} detalle de {issue.id}
-        </Button>
-        {expanded ? (
-          <IssueDetail id={detailId} issue={issue} issues={issues} />
-        ) : null}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              aria-label={`Ver detalle de ${issue.id}`}
+              size="sm"
+              style={styles.detailButton}
+              variant="outline"
+            >
+              Ver detalle
+            </Button>
+          </DialogTrigger>
+          <DialogContent style={styles.issueDialog}>
+            <DialogHeader>
+              <DialogTitle style={styles.dialogTitle}>{label}</DialogTitle>
+              <DialogDescription>
+                Detalle completo, relaciones y descripción de la issue
+              </DialogDescription>
+            </DialogHeader>
+            <IssueDetail id={detailId} issue={issue} issues={issues} />
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
@@ -270,7 +293,6 @@ export function IssueBoard({
     query: "",
     type: "",
   });
-  const [expandedIssueId, setExpandedIssueId] = useState<string | null>(null);
   const normalizedQuery = filters.query.trim().toLocaleLowerCase("es");
   const appOptions = Array.from(
     new Set(issues.flatMap((issue) => (issue.app ? [issue.app] : []))),
@@ -383,16 +405,7 @@ export function IssueBoard({
                 <ol {...stylex.props(styles.issueList)}>
                   {stateIssues.map((issue) => (
                     <li key={issue.id}>
-                      <IssueCard
-                        expanded={expandedIssueId === issue.id}
-                        issue={issue}
-                        issues={issues}
-                        onToggle={() =>
-                          setExpandedIssueId((currentId) =>
-                            currentId === issue.id ? null : issue.id,
-                          )
-                        }
-                      />
+                      <IssueCard issue={issue} issues={issues} />
                     </li>
                   ))}
                 </ol>
