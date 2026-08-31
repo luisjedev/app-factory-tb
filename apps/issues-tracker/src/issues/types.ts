@@ -31,7 +31,34 @@ export interface IssueSource {
   readonly content: string;
 }
 
+export interface IssueDiagnostic {
+  readonly code:
+    | "blocking-cycle"
+    | "duplicate-id"
+    | "id-filename-mismatch"
+    | "invalid-frontmatter"
+    | "invalid-metadata"
+    | "invalid-path"
+    | "missing-metadata"
+    | "self-blocker"
+    | "unknown-app"
+    | "unknown-blocker"
+    | "unknown-source-plan";
+  readonly path: string;
+  readonly message: string;
+}
+
+export interface IssueIndexContext {
+  readonly knownApps: readonly string[];
+  readonly knownPlans: readonly string[];
+}
+
 export interface IssueIndex {
   readonly issues: readonly Issue[];
   readonly byState: Readonly<Record<IssueState, readonly Issue[]>>;
+  readonly diagnostics: readonly IssueDiagnostic[];
+}
+
+export interface IssueRepositoryData extends IssueIndex {
+  readonly loadError?: string;
 }

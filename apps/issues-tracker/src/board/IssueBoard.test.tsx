@@ -1,7 +1,15 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { IssueBoard } from "./IssueBoard";
-import type { Issue } from "../issues/types";
+import type { Issue, IssueDiagnostic } from "../issues/types";
+
+const diagnostics: readonly IssueDiagnostic[] = [
+  {
+    code: "unknown-blocker",
+    path: "issues/backlog/ISS-0003--invalida.md",
+    message: 'El bloqueador "ISS-9999" no referencia una issue existente.',
+  },
+];
 
 const issues: readonly Issue[] = [
   {
@@ -62,6 +70,50 @@ describe("IssueBoard", () => {
       name: "ISS-0001 Ampliar la interfaz compartida",
     });
     expect(within(appIssue).getByText("ui-catalog")).toBeInTheDocument();
+  });
+
+  it("muestra diagnósticos parciales sin ocultar las issues válidas", () => {
+    render(<IssueBoard diagnostics={diagnostics} issues={issues} />);
+
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("Fuente parcialmente inválida");
+    expect(status).toHaveTextContent(
+      "issues/backlog/ISS-0003--invalida.md",
+    );
+    expect(status).toHaveTextContent(
+      'El bloqueador "ISS-9999" no referencia una issue existente.',
+    );
+    expect(screen.getAllByRole("article")).toHaveLength(2);
+  });
+
+  it("distingue una fuente inválida y un fallo de carga del repositorio vacío", () => {
+    const { rerender } = render(
+      <IssueBoard diagnostics={diagnostics} issues={[]} />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "No se pudieron indexar issues",
+    );
+    expect(
+      screen.queryByText("Todavía no hay issues en el repositorio"),
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <IssueBoard
+        issues={[]}
+        loadError="No se pudieron leer las fuentes Markdown."
+      />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "No se pudo cargar el repositorio",
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "No se pudieron leer las fuentes Markdown.",
+    );
+    expect(
+      screen.queryByText("Todavía no hay issues en el repositorio"),
+    ).not.toBeInTheDocument();
   });
 
   it("distingue un repositorio vacío y conserva las cuatro columnas", () => {

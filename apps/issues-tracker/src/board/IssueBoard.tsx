@@ -9,7 +9,12 @@ import {
 import { colors, radii } from "@repo/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { mediaQueries } from "../media.stylex";
-import { ISSUE_STATES, type Issue, type IssueState } from "../issues/types";
+import {
+  ISSUE_STATES,
+  type Issue,
+  type IssueDiagnostic,
+  type IssueState,
+} from "../issues/types";
 
 const STATE_LABELS: Readonly<Record<IssueState, string>> = {
   backlog: "Backlog",
@@ -48,6 +53,22 @@ const PRIORITY_VARIANTS: Readonly<
 const styles = stylex.create({
   emptyState: {
     marginBlockEnd: "1.5rem",
+  },
+  diagnosticList: {
+    display: "grid",
+    gap: "0.5rem",
+    marginBlockEnd: 0,
+    marginBlockStart: "0.75rem",
+    paddingInlineStart: "1.25rem",
+  },
+  diagnosticItem: {
+    display: "grid",
+    gap: "0.125rem",
+  },
+  diagnosticPath: {
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+    fontSize: "0.75rem",
+    overflowWrap: "anywhere",
   },
   board: {
     alignItems: "start",
@@ -190,7 +211,17 @@ function IssueCard({ issue }: { readonly issue: Issue }) {
   );
 }
 
-export function IssueBoard({ issues }: { readonly issues: readonly Issue[] }) {
+type IssueBoardProps = {
+  readonly diagnostics?: readonly IssueDiagnostic[];
+  readonly issues: readonly Issue[];
+  readonly loadError?: string;
+};
+
+export function IssueBoard({
+  diagnostics = [],
+  issues,
+  loadError,
+}: IssueBoardProps) {
   const issuesByState: Record<IssueState, readonly Issue[]> = {
     backlog: issues.filter((issue) => issue.state === "backlog"),
     "in-progress": issues.filter((issue) => issue.state === "in-progress"),
@@ -200,7 +231,58 @@ export function IssueBoard({ issues }: { readonly issues: readonly Issue[] }) {
 
   return (
     <>
-      {issues.length === 0 ? (
+      {loadError ? (
+        <Alert variant="destructive" style={styles.emptyState}>
+          <AlertTitle>No se pudo cargar el repositorio</AlertTitle>
+          <AlertDescription>{loadError}</AlertDescription>
+        </Alert>
+      ) : null}
+
+      {!loadError && diagnostics.length > 0 && issues.length === 0 ? (
+        <Alert variant="destructive" style={styles.emptyState}>
+          <AlertTitle>No se pudieron indexar issues</AlertTitle>
+          <AlertDescription>
+            Corrige las fuentes Markdown indicadas:
+            <ul {...stylex.props(styles.diagnosticList)}>
+              {diagnostics.map((diagnostic) => (
+                <li
+                  {...stylex.props(styles.diagnosticItem)}
+                  key={`${diagnostic.path}-${diagnostic.code}`}
+                >
+                  <strong {...stylex.props(styles.diagnosticPath)}>
+                    {diagnostic.path}
+                  </strong>
+                  <span>{diagnostic.message}</span>
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {!loadError && diagnostics.length > 0 && issues.length > 0 ? (
+        <Alert role="status" style={styles.emptyState}>
+          <AlertTitle>Fuente parcialmente inválida</AlertTitle>
+          <AlertDescription>
+            Las issues válidas siguen disponibles. Corrige estos archivos:
+            <ul {...stylex.props(styles.diagnosticList)}>
+              {diagnostics.map((diagnostic) => (
+                <li
+                  {...stylex.props(styles.diagnosticItem)}
+                  key={`${diagnostic.path}-${diagnostic.code}`}
+                >
+                  <strong {...stylex.props(styles.diagnosticPath)}>
+                    {diagnostic.path}
+                  </strong>
+                  <span>{diagnostic.message}</span>
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {!loadError && diagnostics.length === 0 && issues.length === 0 ? (
         <Alert role="status" style={styles.emptyState}>
           <AlertTitle>Todavía no hay issues en el repositorio</AlertTitle>
           <AlertDescription>

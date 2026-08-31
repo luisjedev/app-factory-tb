@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
 declare module "virtual:issues" {
-  import type { Issue } from "./issues/types";
+  import type { IssueRepositoryData } from "./issues/types";
 
-  const issues: readonly Issue[];
-  export default issues;
+  const issueRepository: IssueRepositoryData;
+  export default issueRepository;
 }
