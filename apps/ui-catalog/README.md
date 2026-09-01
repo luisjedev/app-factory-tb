@@ -8,7 +8,7 @@ Catálogo visual de los componentes exportados por `@repo/ui`.
 - Validar la integración real de `@repo/ui` y StyleX desde una aplicación Vite.
 - Servir como referencia visual para las aplicaciones del monorepo.
 
-`ui-catalog` es una sección nativa independiente. El panel `web` proporcionará acceso a ella, pero no debe importar sus archivos internos.
+`ui-catalog` es una sección nativa independiente. El `dashboard` proporciona acceso a ella, pero no importa sus archivos internos.
 
 ## Desarrollo
 
@@ -17,6 +17,8 @@ Desde la raíz:
 ```bash
 pnpm --filter ui-catalog dev
 ```
+
+La aplicación responde en <http://localhost:3001>.
 
 ## Verificación
 

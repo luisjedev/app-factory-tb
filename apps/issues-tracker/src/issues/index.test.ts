@@ -3,7 +3,7 @@ import { indexIssueSources as indexIssueSourcesWithContext } from "./index";
 import type { IssueIndexContext, IssueSource } from "./types";
 
 const DEFAULT_CONTEXT: IssueIndexContext = {
-  knownApps: ["issues-tracker", "ui-catalog", "web"],
+  knownApps: ["dashboard", "issues-tracker", "ui-catalog"],
   knownPlans: ["PLAN-0001"],
 };
 
@@ -46,7 +46,7 @@ kind: plan-slice
 type: feature
 priority: high
 scope: app
-app: web
+app: dashboard
 createdAt: 2026-08-29
 sourcePlan: PLAN-0001
 blockedBy: []`),
@@ -83,7 +83,7 @@ blockedBy: []`),
         type: "feature",
         priority: "high",
         scope: "app",
-        app: "web",
+        app: "dashboard",
         createdAt: "2026-08-29",
         sourcePlan: "PLAN-0001",
         blockedBy: [],
@@ -236,7 +236,7 @@ kind: simple-task
 type: feature
 priority: high
 scope: general
-app: web
+app: dashboard
 createdAt: 2026-08-30
 blockedBy: []`),
       },
@@ -400,7 +400,7 @@ blockedBy:
   - ISS-0055`),
         },
       ],
-      { knownApps: ["web"], knownPlans: ["PLAN-0001"] },
+      { knownApps: ["dashboard"], knownPlans: ["PLAN-0001"] },
     );
 
     expect(result.issues.map((issue) => issue.id)).toEqual(["ISS-0050"]);
