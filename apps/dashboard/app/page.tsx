@@ -61,24 +61,17 @@ const styles = stylex.create({
       default: "2.5rem",
       "@media (min-width: 48rem)": "4.5rem",
     },
+    marginTop: 0,
+    marginBottom: 20,
     fontWeight: 700,
     letterSpacing: "-0.04em",
     lineHeight: 1,
     textWrap: "balance",
   },
-  intro: {
-    color: colors.mutedForeground,
-    fontSize: {
-      default: "1rem",
-      "@media (min-width: 48rem)": "1.125rem",
-    },
-    lineHeight: 1.7,
-    maxWidth: "42rem",
-  },
   section: {
     marginTop: {
-      default: "3rem",
-      "@media (min-width: 48rem)": "5rem",
+      default: "1rem",
+      "@media (min-width: 48rem)": "3rem",
     },
   },
   sectionHeading: {
@@ -164,13 +157,7 @@ export default function Home() {
   return (
     <main {...stylex.props(styles.page)}>
       <header {...stylex.props(styles.hero)}>
-        <Badge variant="outline">App Factory</Badge>
         <h1 {...stylex.props(styles.heading)}>Bienvenido a App Factory</h1>
-        <p {...stylex.props(styles.intro)}>
-          Una fábrica de aplicaciones para crear y evolucionar productos con
-          rapidez, manteniendo una base compartida de ingeniería, diseño,
-          accesibilidad y calidad.
-        </p>
       </header>
 
       <section {...stylex.props(styles.section)} aria-labelledby="stack-title">
