@@ -4,4 +4,12 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [createStylexVitePlugin(), react()],
+  server: {
+    port: 3001,
+    strictPort: true,
+  },
+  preview: {
+    port: 3001,
+    strictPort: true,
+  },
 });

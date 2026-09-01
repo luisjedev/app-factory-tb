@@ -4,9 +4,9 @@ Monorepo basado en Turborepo para crear y evolucionar aplicaciones con una base 
 
 ## Aplicaciones
 
-- [`apps/web`](apps/web): aplicación de bienvenida y futuro panel de control del monorepo. Será el punto de acceso a las secciones nativas de la fábrica.
-- [`apps/ui-catalog`](apps/ui-catalog): catálogo visual de la interface pública de `@repo/ui`.
-- [`apps/issues-tracker`](apps/issues-tracker): gestor interno de trabajo, actualmente compuesto por issues y planes Markdown; su tablero web está planificado.
+- [`apps/dashboard`](apps/dashboard): entrada local a App Factory y punto de acceso a sus aplicaciones nativas.
+- [`apps/ui-catalog`](apps/ui-catalog): catálogo visual de la interfaz pública de `@repo/ui`, disponible en el puerto `3001`.
+- [`apps/issues-tracker`](apps/issues-tracker): tablero de consulta para las issues y planes Markdown, disponible en el puerto `3002`.
 
 Cada aplicación ejecutable debe poder desarrollarse, comprobarse, compilarse y desplegarse de forma independiente.
 
@@ -41,8 +41,9 @@ pnpm dev
 Para trabajar en una sola aplicación:
 
 ```bash
-pnpm --filter web dev
+pnpm --filter dashboard dev
 pnpm --filter ui-catalog dev
+pnpm --filter issues-tracker dev
 ```
 
 ## Verificación
