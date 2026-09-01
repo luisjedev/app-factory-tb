@@ -1,4 +1,5 @@
 import { Button } from "@repo/ui/button";
+import { RotateCcw } from "@repo/ui/icons";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import {
@@ -45,6 +46,11 @@ const styles = stylex.create({
       default: "100%",
       [mediaQueries.desktop]: "auto",
     },
+  },
+  resetIcon: {
+    flexShrink: 0,
+    height: "1rem",
+    width: "1rem",
   },
 });
 
@@ -130,6 +136,10 @@ export function IssueFilters({
         </NativeSelect>
       </div>
       <Button onClick={onReset} style={styles.resetButton} variant="outline">
+        <RotateCcw
+          {...stylex.props(styles.resetIcon)}
+          aria-hidden="true"
+        />
         Restablecer filtros
       </Button>
     </div>

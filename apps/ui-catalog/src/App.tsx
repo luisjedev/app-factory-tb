@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@repo/ui/card";
 import { Code } from "@repo/ui/code";
+import { Plus } from "@repo/ui/icons";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
 import { NativeSelect, NativeSelectOption } from "@repo/ui/native-select";
@@ -276,6 +277,10 @@ const styles = stylex.create({
     gap: "0.75rem",
     width: "100%",
   },
+  buttonIcon: {
+    height: "1rem",
+    width: "1rem",
+  },
   stack: {
     display: "grid",
     gap: "1rem",
@@ -494,13 +499,22 @@ function App() {
                     <Button>Default</Button>
                     <Button size="lg">Large</Button>
                     <Button aria-label="Small icon button" size="icon-sm">
-                      +
+                      <Plus
+                        {...stylex.props(styles.buttonIcon)}
+                        aria-hidden="true"
+                      />
                     </Button>
                     <Button aria-label="Default icon button" size="icon">
-                      +
+                      <Plus
+                        {...stylex.props(styles.buttonIcon)}
+                        aria-hidden="true"
+                      />
                     </Button>
                     <Button aria-label="Large icon button" size="icon-lg">
-                      +
+                      <Plus
+                        {...stylex.props(styles.buttonIcon)}
+                        aria-hidden="true"
+                      />
                     </Button>
                   </div>
                 </div>

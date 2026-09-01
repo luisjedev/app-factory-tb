@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
+import { ArrowRight } from "@repo/ui/icons";
 import { colors, effects, radii } from "@repo/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
@@ -149,7 +150,9 @@ const styles = stylex.create({
   },
   arrow: {
     flexShrink: 0,
+    height: "1rem",
     marginLeft: "0.75rem",
+    width: "1rem",
   },
 });
 
@@ -207,9 +210,10 @@ export default function Home() {
                 <CardFooter style={styles.cardFooter}>
                   <a href={module.href} {...stylex.props(styles.moduleLink)}>
                     Abrir {module.name.toLocaleLowerCase("es")}
-                    <span aria-hidden="true" {...stylex.props(styles.arrow)}>
-                      →
-                    </span>
+                    <ArrowRight
+                      {...stylex.props(styles.arrow)}
+                      aria-hidden="true"
+                    />
                   </a>
                 </CardFooter>
               )}

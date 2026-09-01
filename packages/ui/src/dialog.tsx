@@ -2,6 +2,7 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as stylex from "@stylexjs/stylex";
+import { X } from "lucide-react";
 import {
   forwardRef,
   type ComponentPropsWithoutRef,
@@ -232,20 +233,7 @@ export const DialogContent = forwardRef<
             aria-label="Cerrar"
             data-slot="dialog-close"
           >
-            <svg
-              {...stylex.props(styles.closeIcon)}
-              aria-hidden="true"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M18 6 6 18M6 6l12 12"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-              />
-            </svg>
+            <X {...stylex.props(styles.closeIcon)} aria-hidden="true" />
             <span {...stylex.props(styles.visuallyHidden)}>Cerrar</span>
           </DialogPrimitive.Close>
         ) : null}

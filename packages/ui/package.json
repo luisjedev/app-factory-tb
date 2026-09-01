@@ -10,6 +10,7 @@
     "./code": "./src/code.tsx",
     "./dialog": "./src/dialog.tsx",
     "./input": "./src/input.tsx",
+    "./icons": "./src/icons.ts",
     "./label": "./src/label.tsx",
     "./media.stylex": "./src/media.stylex.ts",
     "./native-select": "./src/native-select.tsx",
@@ -35,6 +36,7 @@
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
     "@stylexjs/stylex": "catalog:",
+    "lucide-react": "^1.37.0",
     "react": "catalog:",
     "react-dom": "catalog:"
   }
